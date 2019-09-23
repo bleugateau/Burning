@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Burning.Common\Burning.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Burning.DofusProtocol">
+      <HintPath>..\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll</HintPath>
+    </Reference>
+    <Reference Include="FlatyBot.Common">
+      <HintPath>..\..\..\..\Downloads\Nouveau dossier\FlatyBot.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

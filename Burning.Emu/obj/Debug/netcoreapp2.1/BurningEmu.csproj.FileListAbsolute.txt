@@ -1,0 +1,14 @@
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\BurningEmu.deps.json
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\BurningEmu.runtimeconfig.json
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\BurningEmu.runtimeconfig.dev.json
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\BurningEmu.dll
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.csprojAssemblyReference.cache
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.csproj.CoreCompileInputs.cache
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.AssemblyInfoInputs.cache
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.AssemblyInfo.cs
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\BurningEmu.pdb
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\Burning.DofusProtocol.dll
+D:\Developpement\C#\BurningEmu\BurningEmu\bin\Debug\netcoreapp2.1\Burning.DofusProtocol.pdb
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.csproj.CopyComplete
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.dll
+D:\Developpement\C#\BurningEmu\BurningEmu\obj\Debug\netcoreapp2.1\BurningEmu.pdb

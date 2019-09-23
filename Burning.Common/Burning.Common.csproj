@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.4" />
+    <PackageReference Include="MySql.Data" Version="8.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Burning.DofusProtocol">
+      <HintPath>..\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll</HintPath>
+    </Reference>
+    <Reference Include="FlatyBot.Common">
+      <HintPath>..\..\..\..\Downloads\Nouveau dossier\FlatyBot.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

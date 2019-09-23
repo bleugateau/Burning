@@ -1,0 +1,13 @@
+namespace Burning.DofusProtocol.Enums
+{
+  public enum PlayerStatusEnum
+  {
+    PLAYER_STATUS_OFFLINE = 0,
+    PLAYER_STATUS_UNKNOWN = 1,
+    PLAYER_STATUS_AVAILABLE = 10, // 0x0000000A
+    PLAYER_STATUS_IDLE = 20, // 0x00000014
+    PLAYER_STATUS_AFK = 21, // 0x00000015
+    PLAYER_STATUS_PRIVATE = 30, // 0x0000001E
+    PLAYER_STATUS_SOLO = 40, // 0x00000028
+  }
+}

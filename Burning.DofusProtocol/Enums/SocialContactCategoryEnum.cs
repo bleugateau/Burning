@@ -1,0 +1,14 @@
+namespace Burning.DofusProtocol.Enums
+{
+  public enum SocialContactCategoryEnum
+  {
+    SOCIAL_CONTACT_FRIEND,
+    SOCIAL_CONTACT_SPOUSE,
+    SOCIAL_CONTACT_PARTY,
+    SOCIAL_CONTACT_GUILD,
+    SOCIAL_CONTACT_ALLIANCE,
+    SOCIAL_CONTACT_CRAFTER,
+    SOCIAL_CONTACT_INTERLOCUTOR,
+    SOCIAL_CONTACT_FIGHT,
+  }
+}

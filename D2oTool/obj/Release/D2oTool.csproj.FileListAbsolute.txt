@@ -1,0 +1,16 @@
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\D2oTool.exe.config
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\D2oTool.exe
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\D2oTool.pdb
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\Burning.DofusProtocol.dll
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\FlatyBot.Common.dll
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\Newtonsoft.Json.dll
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\Burning.DofusProtocol.pdb
+D:\Developpement\C#\Burning2.52\D2oTool\bin\Release\Newtonsoft.Json.xml
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.csprojAssemblyReference.cache
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.Form1.resources
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.Properties.Resources.resources
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.csproj.GenerateResource.cache
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.csproj.CoreCompileInputs.cache
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.csproj.CopyComplete
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.exe
+D:\Developpement\C#\Burning2.52\D2oTool\obj\Release\D2oTool.pdb

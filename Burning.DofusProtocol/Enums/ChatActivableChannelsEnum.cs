@@ -1,0 +1,21 @@
+namespace Burning.DofusProtocol.Enums
+{
+  public enum ChatActivableChannelsEnum
+  {
+    CHANNEL_GLOBAL,
+    CHANNEL_TEAM,
+    CHANNEL_GUILD,
+    CHANNEL_ALLIANCE,
+    CHANNEL_PARTY,
+    CHANNEL_SALES,
+    CHANNEL_SEEK,
+    CHANNEL_NOOB,
+    CHANNEL_ADMIN,
+    PSEUDO_CHANNEL_PRIVATE,
+    PSEUDO_CHANNEL_INFO,
+    PSEUDO_CHANNEL_FIGHT_LOG,
+    CHANNEL_ADS,
+    CHANNEL_ARENA,
+    CHANNEL_COMMUNITY,
+  }
+}

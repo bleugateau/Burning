@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Burning.DofusProtocol", "Burning.DofusProtocol.csproj", "{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6CAB54C5-2609-48B5-9986-E5D60E6263AC}
+	EndGlobalSection
+EndGlobal

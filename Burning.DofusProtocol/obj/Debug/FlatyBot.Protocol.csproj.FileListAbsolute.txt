@@ -1,0 +1,8 @@
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\FlatyBot.Protocol.csprojAssemblyReference.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\FlatyBot.Protocol.csproj.CoreCompileInputs.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\FlatyBot.Common.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\FlatyBot.Protocol.csproj.CopyComplete
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\Burning.DofusProtocol.pdb
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.pdb

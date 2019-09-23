@@ -1,0 +1,24 @@
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.pdb
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Release\FlatyBot.Common.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csprojAssemblyReference.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CopyComplete
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.pdb
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.pdb
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\bin\Release\FlatyBot.Common.dll
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csprojAssemblyReference.cache
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CopyComplete
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.dll
+D:\Developpement\C#\DotPeekWatermakRemover\DotPeekWatermakRemover\bin\Debug\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.pdb
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.pdb
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\bin\Release\FlatyBot.Common.dll
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csprojAssemblyReference.cache
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.csproj.CopyComplete
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.dll
+D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Release\Burning.DofusProtocol.pdb

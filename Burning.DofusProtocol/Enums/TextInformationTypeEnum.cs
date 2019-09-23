@@ -1,0 +1,14 @@
+namespace Burning.DofusProtocol.Enums
+{
+  public enum TextInformationTypeEnum
+  {
+    TEXT_INFORMATION_MESSAGE,
+    TEXT_INFORMATION_ERROR,
+    TEXT_INFORMATION_PVP,
+    TEXT_INFORMATION_FIGHT_LOG,
+    TEXT_INFORMATION_POPUP,
+    TEXT_LIVING_object,
+    TEXT_ENTITY_TALK,
+    TEXT_INFORMATION_FIGHT,
+  }
+}

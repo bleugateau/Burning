@@ -1,0 +1,16 @@
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\Burning.DofusProtocol.pdb
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\bin\Debug\FlatyBot.Common.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.csproj.CopyComplete
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.pdb
+C:\Users\tenfo\Desktop\Protocol Dofus\FlatyBot.Protocol\obj\Debug\Burning.DofusProtocol.csprojAssemblyReference.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Debug\Burning.DofusProtocol.pdb
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\bin\Debug\FlatyBot.Common.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.csprojAssemblyReference.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.csproj.CopyComplete
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.dll
+C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.pdb
