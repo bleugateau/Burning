@@ -31,7 +31,6 @@
             this.openFile = new System.Windows.Forms.Button();
             this.pathOfFile = new System.Windows.Forms.TextBox();
             this.dataList = new System.Windows.Forms.ListView();
-            this.save = new System.Windows.Forms.Button();
             this.countLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -54,20 +53,12 @@
             // 
             // dataList
             // 
+            this.dataList.HideSelection = false;
             this.dataList.Location = new System.Drawing.Point(34, 67);
             this.dataList.Name = "dataList";
             this.dataList.Size = new System.Drawing.Size(739, 344);
             this.dataList.TabIndex = 2;
             this.dataList.UseCompatibleStateImageBehavior = false;
-            // 
-            // save
-            // 
-            this.save.Location = new System.Drawing.Point(352, 418);
-            this.save.Name = "save";
-            this.save.Size = new System.Drawing.Size(75, 23);
-            this.save.TabIndex = 3;
-            this.save.Text = "Save d2o";
-            this.save.UseVisualStyleBackColor = true;
             // 
             // countLabel
             // 
@@ -83,7 +74,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.countLabel);
-            this.Controls.Add(this.save);
             this.Controls.Add(this.dataList);
             this.Controls.Add(this.pathOfFile);
             this.Controls.Add(this.openFile);
@@ -98,7 +88,6 @@
 
         private System.Windows.Forms.Button openFile;
         public System.Windows.Forms.TextBox pathOfFile;
-        private System.Windows.Forms.Button save;
         public System.Windows.Forms.ListView dataList;
         private System.Windows.Forms.Label countLabel;
     }

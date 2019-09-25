@@ -1,34 +1,41 @@
 ﻿using Burning.Common.Entity;
 using Burning.Common.Managers.Database;
+using Burning.Common.Managers.Singleton;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Repository
 {
-    public static class AccountRepository
+    public class AccountRepository : SingletonManager<AccountRepository>, IRepository<Account>
     {
-        private static string tableName = "accounts";
-        public static string Table { get { return tableName; } }
+        public IMongoCollection<Account> Collection { get; set; }
 
-        public static void Update(Account account)
+        public void Initialize(string dataName)
         {
-            var query = "UPDATE "+ Table +" SET ticket = @Ticket, isBanned = @IsBanned WHERE id = @Id";
-            DbAccessor.Auth.Execute(query, account);
+            this.Collection = DatabaseManager.Instance.Realm.GetCollection<Account>(dataName);
         }
 
-        public static Account GetAccountByLogin(string login)
+        public void Insert(Account entity)
         {
-            var query = "SELECT * FROM " + Table + " WHERE login = @Login";
-            List<Account> accountsList = DbAccessor.Auth.Query<Account>(query, new { Login = login });
-            return accountsList.Count > 0 ? accountsList[0] : null;
+            this.Collection.InsertOne(entity);
         }
 
-        public static Account GetAccountByTicket(string ticket)
+        public void Update(Account entity)
         {
-            var query = "SELECT * FROM " + Table + " WHERE ticket = @Ticket";
-            List<Account> accountsList = DbAccessor.Auth.Query<Account>(query, new { Ticket = ticket });
-            return accountsList.Count > 0 ? accountsList[0] : null;
+            var updateFields = Builders<Account>.Update.Set("Ticket", entity.Ticket);
+            this.Collection.UpdateOne(Builders<Account>.Filter.Eq(x => x.Id, entity.Id), updateFields);
+        }
+
+        public Account GetAccountByLogin(string login)
+        {
+            return this.Collection.Find(Builders<Account>.Filter.Eq("Login", login)).Limit(1).FirstOrDefault();
+        }
+
+        public Account GetAccountByTicket(string ticket)
+        {
+            return this.Collection.Find(Builders<Account>.Filter.Eq("Ticket", ticket)).Limit(1).FirstOrDefault();
         }
     }
 }

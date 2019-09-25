@@ -47,24 +47,26 @@ namespace Burning.Emu.World.Game.World
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            /*
             foreach (var character in CharacterRepository.Instance.List)
             {
                 if (character.IsNew)
                 {
-                    CharacterRepository.Instance.Add(character);
+                    CharacterRepository.Instance.Insert(character);
                     character.IsNew = false;
                 }
                 else
                 {
-                    CharacterRepository.Update(character);
+                    CharacterRepository.Instance.Update(character);
                 }
 
                 if (character.IsDeleted)
                 {
-                    CharacterRepository.Instance.Accessor.Delete<Character>(character);
+                    DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
                 }
             }
-
+            */
+            /*
             foreach(var guild in GuildRepository.Instance.List)
             {
                 if(guild.IsNew)
@@ -82,8 +84,9 @@ namespace Burning.Emu.World.Game.World
                     GuildRepository.Instance.Accessor.Delete<Burning.Common.Entity.Guild>(guild);
                 }
             }
+            */
 
-            
+            /*
             foreach (var member in GuildMemberRepository.Instance.List)
             {
                 if (member.IsNew)
@@ -101,6 +104,7 @@ namespace Burning.Emu.World.Game.World
                     GuildMemberRepository.Instance.Accessor.Delete<GuildMember>(member);
                 }
             }
+            */
 
             Console.WriteLine("World saved !");
         }
@@ -110,7 +114,7 @@ namespace Burning.Emu.World.Game.World
             if (character == null)
                 return null;
 
-            return this.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter != character && x.ActiveCharacter.MapId == character.MapId);
+            return this.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.Id != character.Id && x.ActiveCharacter.MapId == character.MapId);
         }
 
         public WorldClient GetClientFromCharacter(Character character)
@@ -118,7 +122,7 @@ namespace Burning.Emu.World.Game.World
             if (character == null)
                 return null;
 
-            return this.worldClients.Find(x => x.ActiveCharacter == character);
+            return this.worldClients.Find(x => x.ActiveCharacter.Id == character.Id);
         }
     }
 }

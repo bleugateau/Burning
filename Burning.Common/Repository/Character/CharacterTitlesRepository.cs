@@ -1,22 +1,35 @@
 ﻿using Burning.Common.Entity;
+using Burning.Common.Managers.Database;
 using Burning.Common.Managers.Singleton;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Repository
 {
-    public class CharacterTitleRepository : SingletonManager<CharacterTitleRepository>, InterfaceTest<CharacterTitle>
+    public class CharacterTitleRepository : SingletonManager<CharacterTitleRepository>, IRepository<CharacterTitle>
     {
-        public RepositoryAccessor Accessor { get; set; }
-        public List<CharacterTitle> List { get; set; }
-        public string TableName { get; set; }
+        public IMongoCollection<CharacterTitle> Collection { get; set; }
 
-        public void Initialize(string tableName)
+        public void Initialize(string dataName)
         {
-            this.TableName = tableName;
-            this.Accessor = new RepositoryAccessor(this.TableName);
-            this.List = this.Accessor.Fill<CharacterTitle>();
+            this.Collection = DatabaseManager.Instance.World.GetCollection<CharacterTitle>(dataName);
+        }
+
+        public void Insert(CharacterTitle entity)
+        {
+            this.Collection.InsertOne(entity);
+        }
+
+        public void Update(CharacterTitle entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<CharacterTitle> GetTitlesByCharacter(Character character)
+        {
+            return this.Collection.Find(Builders<CharacterTitle>.Filter.Eq("CharacterId", character.Id)).ToList();
         }
     }
 }

@@ -11,6 +11,7 @@ using System.Text;
 using Burning.DofusProtocol.Network.Types;
 using System.Linq;
 using Burning.Emu.World.Game.World;
+using Burning.Common.Managers.Database;
 
 namespace Burning.Emu.World.Frames
 {
@@ -34,19 +35,30 @@ namespace Burning.Emu.World.Frames
         [PacketId(CharacterDeletionRequestMessage.Id)]
         public void CharacterDeletionRequestMessageFrame(WorldClient client, CharacterDeletionRequestMessage characterDeletionRequestMessage)
         {
-            var character = CharacterRepository.Instance.List.Find(x => x.Id == characterDeletionRequestMessage.characterId);
-            character.IsDeleted = true;
+            var character = CharacterRepository.Instance.GetCharacterById((int)characterDeletionRequestMessage.characterId);
+            //character.IsDeleted = true;
 
             if(character.Guild != null)
-                character.Guild.IsDeleted = true;
-            
+            {
+                //character.Guild.IsDeleted = true;
+                var guild = GuildRepository.Instance.GetGuildById(character.Guild.Id);
+
+                foreach (var member in character.Guild.GuildMembers)
+                {
+                    DatabaseManager.Instance.Delete<Burning.Common.Entity.GuildMember>(GuildMemberRepository.Instance.Collection, member);
+                }
+                DatabaseManager.Instance.Delete<Guild>(GuildRepository.Instance.Collection, guild);
+
+            }
+            DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
+
             this.SendCharacterListMessage(client);
         }
 
         [PacketId(CharacterCanBeCreatedRequestMessage.Id)]
         public void CharacterCanBeCreatedRequestMessageFrame(WorldClient client, CharacterCanBeCreatedRequestMessage characterCanBeCreatedRequestMessage)
         {
-            if(CharacterRepository.Instance.List.FindAll(x => x.AccountId == client.Account.Id && x.IsDeleted == false).Count > 3)
+            if(CharacterRepository.Instance.GetCharactersByAccountId(client.Account.Id).Count > 3)
             {
                 client.SendPacket(new CharacterCanBeCreatedResultMessage(false));
                 return;
@@ -72,7 +84,7 @@ namespace Burning.Emu.World.Frames
 
             Character character = new Character()
             {
-                Id = CharacterRepository.Instance.Accessor.LastId<Character>(CharacterRepository.Instance.List) + 1,
+                Id = DatabaseManager.Instance.AutoIncrement<Character>(CharacterRepository.Instance.Collection),
                 AccountId = client.Account.Id,
                 Name = characterCreationRequestMessage.name,
                 Breed = (sbyte)characterCreationRequestMessage.breed,
@@ -82,12 +94,10 @@ namespace Burning.Emu.World.Frames
                 MapId = 88081688,
                 Kamas = 1000,
                 Sex = characterCreationRequestMessage.sex,
-                EntityLook = look.GetDatas(),
-                IsNew = true,
-                IsDeleted = false
+                EntityLook = look.GetDatas()
             };
 
-            CharacterRepository.Instance.List.Add(character);
+            CharacterRepository.Instance.Insert(character);
 
             client.SendPacket(new CharacterCreationResultMessage((uint)CharacterCreationResultEnum.OK));
             this.SendCharacterListMessage(client, true);
@@ -138,7 +148,7 @@ namespace Burning.Emu.World.Frames
         [PacketId(CharacterFirstSelectionMessage.Id)]
         public void CharacterFirstSelectionMessageFrame(WorldClient client, CharacterFirstSelectionMessage characterFirstSelectionMessage)
         {
-            var character = CharacterRepository.Instance.List.Find(x => x.Id == characterFirstSelectionMessage.id && x.IsDeleted == false);
+            var character = CharacterRepository.Instance.GetCharacterById((int)characterFirstSelectionMessage.id);
 
             if (character == null)
             {
@@ -153,7 +163,7 @@ namespace Burning.Emu.World.Frames
         [PacketId(CharacterSelectionMessage.Id)]
         public void CharacterSelectionMessageFrame(WorldClient client, CharacterSelectionMessage characterSelectionMessage)
         {
-            var character = CharacterRepository.Instance.List.Find(x => x.Id == characterSelectionMessage.id && x.IsDeleted == false);
+            var character = CharacterRepository.Instance.GetCharacterById((int)characterSelectionMessage.id);
 
             if(character == null)
             {
@@ -214,6 +224,14 @@ namespace Burning.Emu.World.Frames
                 var memberInfos = guild.GuildMembers.Find(x => x.CharacterId == client.ActiveCharacter.Id);
                 client.SendPacket(new GuildMembershipMessage(new GuildInformations((uint)guild.Id, guild.Name, (uint)guild.Level, new GuildEmblem((uint)guild.SymbolShape, guild.SymbolColor, (uint)guild.BackgroundShape, guild.BackgroundColor)), (memberInfos != null ? (uint)memberInfos.PossessedRight : 0)));
                 client.SendPacket(new GuildInformationsGeneralMessage(false, (uint)guild.Level, 0, guild.Experience, 1000, (uint)guild.CreationDate, 1, (uint)client.ActiveCharacter.Guild.GuildMembers.Count));
+
+                foreach (var member in guild.GuildMembers.FindAll(x => x.Character.Id != client.ActiveCharacter.Id))
+                {
+                    var memberClient = WorldManager.Instance.GetClientFromCharacter(member.Character);
+
+                    if (memberClient != null)
+                        memberClient.SendPacket(new TextInformationMessage(0, 224, new List<string>() { client.ActiveCharacter.Name, client.ActiveCharacter.Id.ToString() }));
+                }
             }
 
             //DARE ???
@@ -328,15 +346,6 @@ namespace Burning.Emu.World.Frames
             {
                 client.SendPacket(new GuildMotdMessage(guild.Announce, 0, 1, client.ActiveCharacter.Name));
                 client.SendPacket(new GuildBulletinMessage(guild.Bulletin, 0, 1, client.ActiveCharacter.Name, 0));
-
-                foreach(var member in guild.GuildMembers.FindAll(x => x.Character != client.ActiveCharacter))
-                {
-                    var memberClient = WorldManager.Instance.GetClientFromCharacter(member.Character);
-
-                    if (memberClient != null)
-                        memberClient.SendPacket(new TextInformationMessage(0, 224, new List<string>() { client.ActiveCharacter.Name, client.ActiveCharacter.Id.ToString() }));
-                }
-
             }
         }
 
@@ -345,7 +354,7 @@ namespace Burning.Emu.World.Frames
          */
         public void SendCharacterListMessage(WorldClient client, bool isCreationResult = false)
         {
-            List<Character> characters = CharacterRepository.Instance.List.FindAll(x => x.AccountId == client.Account.Id && x.IsDeleted == false);
+            List<Character> characters = CharacterRepository.Instance.GetCharactersByAccountId(client.Account.Id);
 
             List<Burning.DofusProtocol.Network.Types.CharacterBaseInformations> characterBaseInformations = new List<Burning.DofusProtocol.Network.Types.CharacterBaseInformations>();
             foreach (var character in characters)

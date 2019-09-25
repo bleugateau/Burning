@@ -12,14 +12,14 @@ namespace Burning.Common.Repository
 {
     public class MapRepository : SingletonManager<MapRepository>, InterfaceTest<Map>
     {
-        public RepositoryAccessor Accessor { get; set; }
+        //public RepositoryAccessor Accessor { get; set; }
         public List<Map> List { get; set; }
         public string TableName { get; set; }
 
         public void Initialize(string tableName)
         {
             this.TableName = tableName;
-            this.Accessor = new RepositoryAccessor(this.TableName);
+            //this.Accessor = new RepositoryAccessor(this.TableName);
             this.List = new List<Map>();
 
             D2pManager.Setup("./" + this.TableName + "/"); //initialize

@@ -5,18 +5,15 @@ using System.Text;
 
 namespace Burning.Common.Entity
 {
-    public class MapTransition : IEntity
+    public class MapTransition : AbstractEntity
     {
-        public int Id { get; set; }
 
-        public int mapIdRequested { get; set; }
+        public int MapIdRequested { get; set; }
 
-        public int mapIdReplaced { get; set; }
+        public int MapIdReplaced { get; set; }
 
-        public MapNeighbourTransitionEnum  fromNeighbour { get; set; }
+        public MapNeighbourTransitionEnum  FromNeighbour { get; set; }
 
-        public bool IsDeleted { get; set; }
-        public bool IsNew { get; set; }
 
         public MapTransition() { }
     }

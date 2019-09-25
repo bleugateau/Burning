@@ -9,7 +9,7 @@ namespace Burning.Common.Repository
 {
     public class MapPositionRepository : SingletonManager<MapPositionRepository>, InterfaceTest<MapPosition>
     {
-        public RepositoryAccessor Accessor { get; set; }
+        //public RepositoryAccessor Accessor { get; set; }
         public List<MapPosition> List { get; set; }
         public string TableName { get; set; }
 

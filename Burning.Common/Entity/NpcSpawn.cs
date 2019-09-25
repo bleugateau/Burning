@@ -1,17 +1,18 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Entity
 {
-    public class NpcSpawn : IEntity
+    public class NpcSpawn : AbstractEntity
     {
-        public int Id { get; set; }
-
         public int NpcId { get; set; }
-
+        
+        [BsonIgnore]
         public string EntityLook { get; set; }
 
+        [BsonIgnore]
         public bool Gender { get; set; }
 
         public int MapId { get; set; }
@@ -19,8 +20,5 @@ namespace Burning.Common.Entity
         public int CellId { get; set; }
 
         public int Orientation { get; set; }
-
-        public bool IsDeleted { get; set; }
-        public bool IsNew { get; set; }
     }
 }

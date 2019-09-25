@@ -98,54 +98,5 @@ namespace Burning.DofusProtocol.Datacenter
         public List<uint> containerIds;
 
         public List<List<int>> resourcesBySubarea;
-
-        /* 2.50
-        public int Id;
-        public uint NameId;
-        public uint TypeId;
-        public uint DescriptionId;
-        public int IconId;
-        public uint Level;
-        public uint RealWeight;
-        public bool Cursed;
-        public int UseAnimationId;
-        public bool Usable;
-        public bool Targetable;
-        public bool Exchangeable;
-        public double Price;
-        public bool TwoHanded;
-        public bool Etheral;
-        public int ItemSetId;
-        public string Criteria;
-        public string CriteriaTarget;
-        public bool HideEffects;
-        public bool Enhanceable;
-        public bool NonUsableO0other;
-        public uint AppearanceId;
-        public bool SecretRecipe;
-        public List<uint> DropMonsterIds;
-        public uint RecipeSlots;
-        public List<uint> RecipeIds;
-        public bool BonusIsSecret;
-        public List<EffectInstance> PossibleEffects;
-        public List<uint> FavoriteSubAreas;
-        public uint FavoriteSubAreasBonus;
-        public int CraftXpRatio;
-        public bool NeedUseConfirm;
-        public bool IsDestructible;
-        public List<List<double>> NuggetsBySubarea;
-        public List<uint> ContainerIds;
-        public List<List<int>> ResourcesBySubarea;
-        public ItemType Type;
-        public uint Weight;
-        public bool ObjectIsDisplayOnWeb;
-        public bool IsSaleable;
-        public string CraftVisible;
-        public string CraftFeasible;
-        public List<int> EvolutiveEffectIds;
-        public List<int> DropTemporisMonsterIds;
-        public bool NonUsableOnAnother;
-
-    */
     }
 }

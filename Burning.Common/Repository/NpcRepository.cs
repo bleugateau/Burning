@@ -2,14 +2,16 @@
 using Burning.Common.Managers.Singleton;
 using Burning.DofusProtocol.Data.D2o;
 using Burning.DofusProtocol.Datacenter;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Repository
 {
-    public class NpcRepository : SingletonManager<NpcRepository>, InterfaceTest<Npc>
+    public class NpcRepository : SingletonManager<NpcRepository>, IRepository<Npc>
     {
+        /*
         public RepositoryAccessor Accessor { get; set; }
         public string TableName { get; set; }
         public List<Npc> List { get; set; }
@@ -33,6 +35,38 @@ namespace Burning.Common.Repository
         public Npc GetNpcFromId(int npcId)
         {
             return this.List.Find(x => x.Id == npcId);
+        }
+        */
+        public IMongoCollection<Npc> Collection { get; set; }
+
+        private List<Npc> List { get; set; }
+
+        public void Initialize(string dataName)
+        {
+            this.Collection = DatabaseManager.Instance.DataCenter.GetCollection<Npc>(dataName);
+            this.List = new List<Npc>();
+        }
+
+        public Npc GetNpcFromId(int npcId, bool lazy = true)
+        {
+            var npc = this.List.Find(x => x.Id == npcId);
+
+            if(!lazy || npc == null)
+                npc = this.Collection.Find(Builders<Npc>.Filter.Eq("_id", npcId)).Limit(1).FirstOrDefault();
+
+
+            return npc;
+        }
+
+
+        public void Insert(Npc entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Npc entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

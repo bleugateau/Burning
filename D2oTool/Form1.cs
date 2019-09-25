@@ -11,32 +11,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using MongoDB.Driver;
 
 namespace D2oTool
 {
     public partial class Form1 : Form
     {
-        public OpenFileDialog openFileDialog { get; set; }
-        public D2oReader reader { get; set; }
+        public OpenFileDialog OpenFileDialog { get; set; }
+        public D2oReader Reader { get; set; }
+
+        public string DataName { get; set; }
         public Form1()
         {
             InitializeComponent();
-            openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = "d2o";
-            openFileDialog.Title = "Open your Dofus 2 file";
-            openFileDialog.Filter = "Dofus 2 file (*.d2o)|*.d2o";
+            OpenFileDialog = new OpenFileDialog();
+            OpenFileDialog.DefaultExt = "d2o";
+            OpenFileDialog.Title = "Open your Dofus 2 file";
+            OpenFileDialog.Filter = "Dofus 2 file (*.d2o)|*.d2o";
             //????
             this.dataList.View = View.Details;
         }
 
         public void LoadD2o(string path, string name)
         {
-            this.reader = new D2oReader(path);
+            this.Reader = new D2oReader(path);
+
+            this.DataName = name.Split('.')[0];
 
             Invoke(new Action(() =>
             {
                 this.Text = name;
-                this.countLabel.Text = this.reader.IndexCount + " line(s) draw.";
+                this.countLabel.Text = this.Reader.IndexCount + " line(s) draw.";
                 this.dataList.Clear();
             }));
 
@@ -44,7 +49,7 @@ namespace D2oTool
 
             List<string> itemContent = new List<string>();
             bool headersFilled = false;
-            foreach (var obj in this.reader.ReadObjects())
+            foreach (var obj in this.Reader.ReadObjects())
             {
                 try
                 {
@@ -60,7 +65,11 @@ namespace D2oTool
                     for (int f = 0; f < fields.Length; f++)
                     {
                         if (!headersFilled)
+                        {
                             Invoke(new Action(() => { this.dataList.Columns.Add(fields[f].Name); }));
+                            
+                        }
+                            
 
                         var fieldValue = fields[f].GetValue(obj.Value);
                         string content = JsonConvert.SerializeObject(fieldValue);
@@ -91,12 +100,12 @@ namespace D2oTool
 
         private void OpenFile_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
-                this.pathOfFile.Text = openFileDialog.FileName;
+                this.pathOfFile.Text = OpenFileDialog.FileName;
                 //read d2o
 
-                Task.Run(() => this.LoadD2o(openFileDialog.FileName, openFileDialog.SafeFileName));
+                Task.Run(() => this.LoadD2o(OpenFileDialog.FileName, OpenFileDialog.SafeFileName));
             }
         }
     }

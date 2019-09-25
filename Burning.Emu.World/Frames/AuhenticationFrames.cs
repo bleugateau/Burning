@@ -19,7 +19,7 @@ namespace Burning.Emu.World.Frames
             string ticket = AuthenticationUtils.DecodeTicket(authenticationTicketMessage.ticket);
 
             //client.SendPacket(new AuthenticationTicketAcceptedMessage());
-            var account = AccountRepository.GetAccountByTicket(ticket);
+            var account = AccountRepository.Instance.GetAccountByTicket(ticket);
 
             if(account == null)
             {

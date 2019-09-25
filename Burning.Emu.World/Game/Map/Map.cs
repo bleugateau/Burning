@@ -30,13 +30,14 @@ namespace Burning.Emu.World.Game.Map
             this.Id = mapId;
             this.MapData = mapData;
             this.NpcSpawnList = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(mapId);
+
             this.InteractiveElementList = new List<InteractiveElement>(); //a fill avec la db
             this.StatedElementList = new List<StatedElement>(); //a fill avec la db
         }
 
         public void ReloadNpc()
         {
-            this.NpcSpawnList = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(this.Id);
+            this.NpcSpawnList = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(this.Id, false);
             Console.WriteLine("Npc from MapId {0} reloaded.", this.Id);
         }
 

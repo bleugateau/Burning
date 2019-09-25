@@ -45,6 +45,10 @@
               "target": "Package",
               "version": "[2.0.4, )"
             },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.9.1, )"
+            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.0.17, )"

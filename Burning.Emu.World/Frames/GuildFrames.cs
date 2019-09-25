@@ -11,6 +11,7 @@ using Burning.Common.Entity;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Game.Guild;
 using Burning.DofusProtocol.Datacenter;
+using Burning.Common.Managers.Database;
 
 namespace Burning.Emu.World.Frames
 {
@@ -32,7 +33,7 @@ namespace Burning.Emu.World.Frames
                 return;
             }
 
-            if(GuildRepository.Instance.List.Find(x => x.Name == guildCreationValidMessage.guildName && x.IsDeleted == false) != null)
+            if(GuildRepository.Instance.IsNameAlreadyExist(guildCreationValidMessage.guildName))
             {
                 client.SendPacket(new GuildCreationResultMessage((uint)SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_NAME_ALREADY_EXISTS));
                 return;
@@ -40,31 +41,29 @@ namespace Burning.Emu.World.Frames
 
             var guild = new Guild()
             {
-                Id = GuildRepository.Instance.Accessor.LastId<Guild>(GuildRepository.Instance.List) + 1,
+                Id = DatabaseManager.Instance.AutoIncrement<Guild>(GuildRepository.Instance.Collection),
                 Name = guildCreationValidMessage.guildName,
-                ownerCharacterId = client.ActiveCharacter.Id,
+                OwnerCharacterId = client.ActiveCharacter.Id,
                 Level = 1,
                 Experience = 0,
                 SymbolColor = guildCreationValidMessage.guildEmblem.symbolColor,
                 SymbolShape = (int)guildCreationValidMessage.guildEmblem.symbolShape,
                 BackgroundColor = guildCreationValidMessage.guildEmblem.backgroundColor,
                 BackgroundShape = (int)guildCreationValidMessage.guildEmblem.backgroundShape,
-                CreationDate = (int)(DateTime.Now - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds, //a patch pas bonne date
-                IsNew = true
+                CreationDate = (int)(DateTime.Now - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds //a patch pas bonne date
             };
 
-            GuildRepository.Instance.List.Add(guild);
+            GuildRepository.Instance.Insert(guild);
 
             var guildMember = new GuildMember(guild.Id, client.ActiveCharacter.Id)
             {
-                Id = GuildMemberRepository.Instance.Accessor.LastId<GuildMember>(GuildMemberRepository.Instance.List) + 1,
+                Id = DatabaseManager.Instance.AutoIncrement<GuildMember>(GuildMemberRepository.Instance.Collection),
                 Role = 1,
                 PossessedRight = 262145,
-                PourcentageXpGiven = 0,
-                IsNew = true
+                PourcentageXpGiven = 0
             };
 
-            GuildMemberRepository.Instance.List.Add(guildMember);
+            GuildMemberRepository.Instance.Insert(guildMember);
 
             client.SendPacket(new GuildInformationsPaddocksMessage(5, new List<Burning.DofusProtocol.Network.Types.PaddockContentInformations>()));
             client.SendPacket(new GuildHousesInformationMessage(new List<Burning.DofusProtocol.Network.Types.HouseInformationsForGuild>()));
@@ -79,7 +78,7 @@ namespace Burning.Emu.World.Frames
                 return;
 
             //check si il a le droit d'inviter a faire
-            var member = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character == client.ActiveCharacter && x.IsDeleted == false);
+            var member = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character.Id == client.ActiveCharacter.Id);
 
             if (!member.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_INVITE_NEW_MEMBERS])
             {
@@ -110,20 +109,19 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter.Guild != null || invitation == null)
                 return;
 
-            var senderClient = WorldManager.Instance.GetClientFromCharacter(CharacterRepository.Instance.List.Find(x => x.Id == client.ActiveCharacter.Id));
+            var senderClient = WorldManager.Instance.GetClientFromCharacter(CharacterRepository.Instance.GetCharacterById(client.ActiveCharacter.Id));
 
             if (guildInvitationAnswerMessage.accept)
             {
                 var guildMember = new GuildMember(invitation.GuildId, client.ActiveCharacter.Id)
                 {
-                    Id = GuildMemberRepository.Instance.Accessor.LastId<GuildMember>(GuildMemberRepository.Instance.List) + 1,
+                    Id = DatabaseManager.Instance.AutoIncrement<GuildMember>(GuildMemberRepository.Instance.Collection),
                     Role = 0,
                     PossessedRight = (int)GuildRightsBitEnum.GUILD_RIGHT_NONE,
-                    PourcentageXpGiven = 5,
-                    IsNew = true
+                    PourcentageXpGiven = 5
                 };
 
-                GuildMemberRepository.Instance.List.Add(guildMember);
+                GuildMemberRepository.Instance.Insert(guildMember);
 
                 senderClient.SendPacket(new GuildInvitationStateRecrutedMessage((uint)SocialGroupInvitationStateEnum.SOCIAL_GROUP_INVITATION_OK));
             }
@@ -142,45 +140,30 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter == null || client.ActiveCharacter.Guild == null)
                 return;
 
-            var target = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.CharacterId == guildKickRequestMessage.kickedId && x.IsDeleted == false);
+            var target = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.CharacterId == guildKickRequestMessage.kickedId);
 
             if (target == null)
                 return;
 
 
-            var activeCharacterMember = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character == client.ActiveCharacter);
+            var activeCharacterMember = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character.Id == client.ActiveCharacter.Id);
 
             //si j'ai les droit de kick un membre de la guilde et que se membre n'est pas moi
-            if (activeCharacterMember != null && target != activeCharacterMember && activeCharacterMember.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_BAN_MEMBERS])
+            if (activeCharacterMember != null && target.Id != activeCharacterMember.Id && activeCharacterMember.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_BAN_MEMBERS])
             {
-                target.IsDeleted = true;
+                //delete le member
                 WorldManager.Instance.GetClientFromCharacter(target.Character).SendPacket(new GuildInformationsGeneralMessage());
-                client.SendPacket(new GuildInformationsMembersMessage(GuildManager.Instance.GetGuildMembers(target.Guild)));
+
+                client.SendPacket(new GuildInformationsMembersMessage(GuildManager.Instance.GetGuildMembers(activeCharacterMember.Guild)));
+                DatabaseManager.Instance.Delete<GuildMember>(GuildMemberRepository.Instance.Collection, target);
             }
-            else if(activeCharacterMember != null && target == activeCharacterMember && client.ActiveCharacter.Id != client.ActiveCharacter.Guild.ownerCharacterId) //si je m'auto kick
+            else if(activeCharacterMember != null && target.Id == activeCharacterMember.Id && client.ActiveCharacter.Id != client.ActiveCharacter.Guild.OwnerCharacterId) //si je m'auto kick
             {
-                activeCharacterMember.IsDeleted = true;
+                //delete le member
+                DatabaseManager.Instance.Delete<GuildMember>(GuildMemberRepository.Instance.Collection, activeCharacterMember);
+                //GuildMemberRepository.
                 //client.SendPacket(new GuildR()); besoin de bibiche pour la suite
             }
-
-            /*
-            if (client.ActiveCharacter == null || client.ActiveCharacter.Guild == null)
-                return;
-
-            if (client.ActiveCharacter.Guild.ownerCharacterId == client.ActiveCharacter.Id)
-                return;
-
-            client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character == client.ActiveCharacter).IsDeleted = true;
-
-            */
-
-            //kick qqun d'une guilde
-            //1 = sois je peux kick
-            //2 = sois je m'auto kick
-
-
-            //client.SendPacket(new GuildInformationsGeneralMessage(false, (uint)guild.Level, 0, guild.Experience, 1000, (uint)guild.CreationDate, 1, 1));
-
         }
 
         [PacketId(GuildChangeMemberParametersMessage.Id)]
@@ -189,7 +172,7 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter == null || client.ActiveCharacter.Guild == null)
                 return;
 
-            var member = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character == client.ActiveCharacter && x.IsDeleted == false);
+            var member = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.CharacterId == client.ActiveCharacter.Id);
             var target = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.CharacterId == guildChangeMemberParametersMessage.memberId);
 
             if(target == null)
@@ -200,14 +183,15 @@ namespace Burning.Emu.World.Frames
             if (member.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_MANAGE_RANKS])
             {
                 target.Role = (int)guildChangeMemberParametersMessage.rank;
-                client.SendPacket(new GuildInformationsMembersMessage(GuildManager.Instance.GetGuildMembers(client.ActiveCharacter.Guild)));
             }
 
             if(member.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_MANAGE_RIGHTS])
             {
                 target.PossessedRight = (int)guildChangeMemberParametersMessage.rights;
-                client.SendPacket(new GuildInformationsMembersMessage(GuildManager.Instance.GetGuildMembers(client.ActiveCharacter.Guild)));
             }
+
+            GuildMemberRepository.Instance.Update(target);
+            client.SendPacket(new GuildInformationsMembersMessage(GuildManager.Instance.GetGuildMembers(client.ActiveCharacter.Guild)));
         }
 
         [PacketId(GuildMotdSetRequestMessage.Id)]
@@ -217,7 +201,7 @@ namespace Burning.Emu.World.Frames
                 return;
 
 
-            if(client.ActiveCharacter.Id != client.ActiveCharacter.Guild.ownerCharacterId)
+            if(client.ActiveCharacter.Id != client.ActiveCharacter.Guild.OwnerCharacterId)
             {
                 client.SendPacket(new GuildMotdSetErrorMessage(1));
                 return;
@@ -233,7 +217,7 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter == null || client.ActiveCharacter.Guild == null)
                 return;
 
-            if(client.ActiveCharacter.Id != client.ActiveCharacter.Guild.ownerCharacterId)
+            if(client.ActiveCharacter.Id != client.ActiveCharacter.Guild.OwnerCharacterId)
             {
                 client.SendPacket(new GuildBulletinSetErrorMessage(1));
                 return;

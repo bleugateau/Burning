@@ -6,8 +6,8 @@ namespace Burning.DofusProtocol.Datacenter
   public class EffectInstanceInteger : EffectInstance
   {
     public int Value;
-    public new int SpellId;
-    public new int Dispellable;
-    public new bool ForClientOnly;
+    //public new int SpellId;
+    //public new int Dispellable;
+    //public new bool ForClientOnly;
   }
 }

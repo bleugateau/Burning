@@ -1,16 +1,15 @@
 ﻿using Burning.Common.Repository;
 using Burning.DofusProtocol.Network.Types;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Entity
 {
-    public class Guild : IEntity
+    public class Guild : AbstractEntity
     {
-        public int Id { get; set; }
-
-        public int ownerCharacterId { get; set; }
+        public int OwnerCharacterId { get; set; }
 
         public string Name { get; set; }
 
@@ -31,18 +30,15 @@ namespace Burning.Common.Entity
         public int BackgroundColor { get; set; }
 
         public int CreationDate { get; set; }
-
+        
+        [BsonIgnore]
         public List<GuildMember> GuildMembers
         {
             get
             {
-                return GuildMemberRepository.Instance.List.FindAll(x => x.Guild == this && x.IsDeleted == false);
+                return GuildMemberRepository.Instance.GetGuildMembersFromGuildId(this.Id);
             }
         }
-
-        public bool IsDeleted { get; set; }
-
-        public bool IsNew { get; set; }
 
         public Guild () { }
 

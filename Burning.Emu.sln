@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D2oTool", "D2oTool\D2oTool.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Burning.DofusProtocol", "Burning.DofusProtocol\Burning.DofusProtocol.csproj", "{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Burning.D2oSync", "Burning.D2oSync\Burning.D2oSync.csproj", "{A7989E55-B09A-4336-B713-327DA244BA4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96EFA0DC-6A50-4966-B429-CDC1F155BEB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7989E55-B09A-4336-B713-327DA244BA4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7989E55-B09A-4336-B713-327DA244BA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7989E55-B09A-4336-B713-327DA244BA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7989E55-B09A-4336-B713-327DA244BA4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

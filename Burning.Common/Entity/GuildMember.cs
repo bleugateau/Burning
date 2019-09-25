@@ -2,15 +2,15 @@
 using Burning.Common.Repository;
 using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Enums;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Entity
 {
-    public class GuildMember : IEntity
+    public class GuildMember : AbstractEntity
     {
-        public int Id { get; set; }
 
         public int GuildId { get; set; }
 
@@ -22,22 +22,25 @@ namespace Burning.Common.Entity
 
         public int PourcentageXpGiven { get; set; }
 
+        [BsonIgnore]
         public Guild Guild
         {
             get
             {
-                return GuildRepository.Instance.List.Find(x => x.Id == this.GuildId);
+                return GuildRepository.Instance.GetGuildById(this.GuildId);
             }
         }
 
+        [BsonIgnore]
         public Character Character
         {
             get
             {
-                return CharacterRepository.Instance.List.Find(x => x.Id == this.CharacterId);
+                return CharacterRepository.Instance.GetCharacterById(this.CharacterId);
             }
         }
 
+        [BsonIgnore]
         public Dictionary<GuildRightsBitEnum, bool> GuildRightsItemCriterion
         {
             get
@@ -45,10 +48,6 @@ namespace Burning.Common.Entity
                 return GuildRightsManager.GetRights((uint)this.PossessedRight);
             }
         }
-
-        public bool IsDeleted { get; set; }
-
-        public bool IsNew { get; set; }
 
         public GuildMember() { }
 

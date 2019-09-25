@@ -25,19 +25,13 @@ namespace Burning.Emu.World
         private static List<Task> serverTaskList = new List<Task>();
         static void Main(string[] args)
         {
+            Console.Title = "[WORLD] BurningEmu for Dofus 2.52.14 RELEASE";
+
             FrameManager.Initialize("Burning.Emu.World");
-
-            DbAccessor.Auth = new DatabaseManager();
-            DbAccessor.Auth.Initialize("localhost", "burning", "root", "");
-
-            DbAccessor.World = new DatabaseManager();
-            DbAccessor.World.Initialize("localhost", "burning_world", "root", "");
-
-            CharacterRepository.Instance.Initialize("characters");
-            Console.WriteLine("{0} character(s) loaded", CharacterRepository.Instance.List.Count);
-
-            GuildRepository.Instance.Initialize("guilds");
-            GuildMemberRepository.Instance.Initialize("guilds_members");
+            DatabaseManager.Instance.Initialize("mongodb://localhost");
+            
+            AccountRepository.Instance.Initialize("account");
+            CharacterRepository.Instance.Initialize("character");
 
             BreedRepository.Instance.Initialize("breeds");
             Console.WriteLine("{0} breed(s) loaded from d2o.", BreedRepository.Instance.List.Count);
@@ -45,21 +39,17 @@ namespace Burning.Emu.World
             HeadRepository.Instance.Initialize("heads");
             Console.WriteLine("{0} head(s) loaded from d2o.", HeadRepository.Instance.List.Count);
 
-            NpcRepository.Instance.Initialize("npcs");
-            Console.WriteLine("{0} npc(s) loaded from d2o.", NpcRepository.Instance.List.Count);
-
-            /*
-            MapRepository.Instance.Initialize("maps");
-            Console.WriteLine("Map lazy loading from d2p...");
-            */
+            GuildRepository.Instance.Initialize("guild");
 
             MapManager.Instance.Initialize("maps");
 
             MapTransitionsRepository.Instance.Initialize("maps_transitions");
-            Console.WriteLine("{0} map(s) transition(s) loaded from d2o.", MapTransitionsRepository.Instance.List.Count);
 
+            /*
+            
             ElementsEleRepository.Instance.Initialize("elements_ele");
             Console.WriteLine("{0} elements from elements.ele loaded.", ElementsEleRepository.Instance.List.Count);
+            */
 
             WorldServer worldServer = new WorldServer("127.0.0.1", 6666);
             serverTaskList.Add(Task.Run(() => worldServer.Start()));
@@ -67,7 +57,7 @@ namespace Burning.Emu.World
             //Manager
             CommandManager.Instance.Initialize();
             GuildManager.Instance.Initialize();
-            WorldManager.Instance.Initialize();
+            //WorldManager.Instance.Initialize();
 
             Task.WaitAll(serverTaskList.ToArray());
         }

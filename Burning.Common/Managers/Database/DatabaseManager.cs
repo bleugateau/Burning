@@ -1,73 +1,42 @@
-﻿using System;
+﻿using Burning.Common.Managers.Singleton;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
 using System.Text;
-using Burning.Common.Entity;
-using Dapper;
-using MySql.Data.MySqlClient;
 
 namespace Burning.Common.Managers.Database
 {
-    public class DatabaseManager
+    public class DatabaseManager : SingletonManager<DatabaseManager>
     {
+        public MongoClient MongoClient { get; set; }
 
-        public IDbConnection dbConnection;
-        public bool IsInitialized = false;
-        private string DatabaseName = "";
+        public IMongoDatabase Realm { get; set; }
 
-        public void Initialize(string host, string databaseName, string username, string password)
+        public IMongoDatabase World { get; set; }
+
+        public IMongoDatabase DataCenter { get; set; }
+
+
+        public void Initialize(string connectionString)
         {
-            if (IsInitialized)
+            this.MongoClient = new MongoClient(connectionString);
+            this.Realm = this.MongoClient.GetDatabase("burning");
+            this.World = this.MongoClient.GetDatabase("burning_world");
+            this.DataCenter = this.MongoClient.GetDatabase("burning_datacenter");
+        }
+
+        public int AutoIncrement<T>(IMongoCollection<T> collection)
+        {
+            dynamic entity = collection.Find(Builders<T>.Filter.Gt("_id", 0)).Sort("{_id : -1}").Limit(1).FirstOrDefault();
+            return (int)(entity != null ?  entity.Id + 1 : 1);
+        }
+
+        public void Delete<T>(IMongoCollection<T> collection, dynamic entity)
+        {
+            if (entity == null)
                 return;
 
-            MySqlConnectionStringBuilder sConnB = new MySqlConnectionStringBuilder()
-            {
-                Server = host,
-                Database = databaseName,
-                UserID = username,
-                Password = password
-            };
-
-            dbConnection = new MySqlConnection(sConnB.ConnectionString);
-            try
-            {
-                dbConnection.Open();
-                DatabaseName = databaseName;
-                Console.WriteLine("Database {0} initialized !", DatabaseName);
-                IsInitialized = true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("[DATABASE] {0}", ex.ToString());
-            }
-        }
-
-        public bool Exist<T>(string tableName, IEntity obj)
-        {
-            var query = "SELECT * FROM " + tableName + " WHERE id=@Id";
-            List<T> list = this.Query<T>(query, new {Id = obj.Id });
-            return list.Count > 0 ? true : false;
-        }
-
-        public List<T> Query<T>(string query, object param = null)
-        {
-            return new List<T>(dbConnection.Query<T>(query, param));
-        }
-
-        public void Execute(string query, object param = null)
-        {
-            dbConnection.Execute(query, param);
-        }
-
-        public void Close()
-        {
-            if (!IsInitialized)
-                return;
-
-            dbConnection.Close();
-            Console.WriteLine("Database {0} closed !", DatabaseName);
-            IsInitialized = false;
+            collection.DeleteOne(Builders<T>.Filter.Eq("_id", entity.Id));
         }
     }
 }

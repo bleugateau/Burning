@@ -49,7 +49,7 @@ namespace Burning.Emu.World.Frames
             List<StatedElement> statedElements = new List<StatedElement>();
            
             List<uint> elementIds = new List<uint>();
-
+            /*
             foreach (var layer in map.MapData.Layers)
             {
                 foreach (var cell in layer.Cells)
@@ -72,6 +72,7 @@ namespace Burning.Emu.World.Frames
                     }
                 }
             }
+            */
 
             //
             List<GameRolePlayActorInformations> gameRolePlayActorInformations = new List<GameRolePlayActorInformations>();
@@ -117,16 +118,17 @@ namespace Burning.Emu.World.Frames
             }
 
             client.ActiveCharacter.CellId = cellId;
+            CharacterRepository.Instance.Update(client.ActiveCharacter);
         }
 
         [PacketId(ChangeMapMessage.Id)]
         public void ChangeMapMessageFrame(WorldClient client, ChangeMapMessage changeMapMessage)
         {
             int mapId = (int)changeMapMessage.mapId;
-            MapTransition replacedMap = MapTransitionsRepository.Instance.List.Find(x => x.mapIdRequested == changeMapMessage.mapId && x.fromNeighbour == (MapManager.Instance.GetMapNeighbourTransitionEnumFromCell(client.ActiveCharacter.CellId)));
+            MapTransition replacedMap = MapTransitionsRepository.Instance.GetTransitionFromMapId((int)changeMapMessage.mapId, (int)MapManager.Instance.GetMapNeighbourTransitionEnumFromCell(client.ActiveCharacter.CellId));
 
             if (replacedMap != null)
-                mapId = replacedMap.mapIdReplaced;
+                mapId = replacedMap.MapIdReplaced;
 
             var map = MapManager.Instance.GetMap(mapId);
 
@@ -147,6 +149,8 @@ namespace Burning.Emu.World.Frames
                 client.SendPacket(new CurrentMapMessage(client.ActiveCharacter.MapId, "649ae451ca33ec53bbcbcc33becf15f4"));
 
                 client.ActiveCharacter.CellId = MapManager.Instance.CheckWalkableCell(mapId, MapManager.Instance.GetOppositeCellFromNeight(client.ActiveCharacter.CellId));
+
+                CharacterRepository.Instance.Update(client.ActiveCharacter);
             }
         }
     }

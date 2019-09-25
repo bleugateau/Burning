@@ -20,7 +20,7 @@ namespace Burning.Emu.Frames
 
             List<string> credential = identificationMessage.lang.Split('|').ToList(); //acount resolve from DI patch
 
-            var account = AccountRepository.GetAccountByLogin(credential[0]);
+            var account = AccountRepository.Instance.GetAccountByLogin(credential[0]);
 
             if(account == null)
             {
@@ -50,7 +50,7 @@ namespace Burning.Emu.Frames
 
             client.Account = account;
             client.Account.Ticket = client.salt;
-            AccountRepository.Update(client.Account);
+            AccountRepository.Instance.Update(client.Account);
         }
     }
 }

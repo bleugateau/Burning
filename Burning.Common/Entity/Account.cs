@@ -4,9 +4,8 @@ using System.Text;
 
 namespace Burning.Common.Entity
 {
-    public class Account
+    public class Account : AbstractEntity
     {
-        public int Id { get; set; }
         public string Login { get; set; }
         public string Nickname { get; set; }
         public string Password { get; set; }

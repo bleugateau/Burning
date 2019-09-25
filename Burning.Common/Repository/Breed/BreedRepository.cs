@@ -13,14 +13,14 @@ namespace Burning.Common.Repository
         private static string tableName = "breeds";
         public static string Table { get { return tableName; } }
 
-        public RepositoryAccessor Accessor { get; set; }
+        //public RepositoryAccessor Accessor { get; set; }
         public string TableName { get; set; }
         public List<Burning.DofusProtocol.Datacenter.Breed> List { get; set; }
 
         public void Initialize(string tableName)
         {
             this.TableName = tableName;
-            this.Accessor = new RepositoryAccessor(this.TableName);
+            //this.Accessor = new RepositoryAccessor(this.TableName);
             //this.List = this.Accessor.Fill<Breed>();
 
             this.List = new List<Burning.DofusProtocol.Datacenter.Breed>();

@@ -2,6 +2,7 @@
 using Burning.Common.Utility.EntityLook;
 using Burning.DofusProtocol.Data.D2P;
 using Burning.DofusProtocol.Network.Types;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,10 +10,8 @@ using System.Threading.Tasks;
 
 namespace Burning.Common.Entity
 {
-    public class Character : IEntity
+    public class Character : AbstractEntity
     {
-
-        public int Id { get; set; }
         public int AccountId { get; set; }
         public string Name { get; set; }
 
@@ -32,29 +31,20 @@ namespace Burning.Common.Entity
 
         public int CellId { get; set; }
 
-        public Map MapData
-        {
-            get
-            {
-                return MapRepository.Instance.GetMap(this.MapId);
-            }
-        }
-
         public int ActiveTitle { get; set; }
+
         public int ActiveOrnament { get; set; }
 
+        [BsonIgnore]
         public Guild Guild {
             get
             {
-                var guildMember = GuildMemberRepository.Instance.List.Find(x => x.IsDeleted == false && x.Character == this);
+                var guildMember = GuildMemberRepository.Instance.GetGuildMemberFromCharacterId(this.Id);
                 return guildMember != null ? guildMember.Guild : null;
             }
         }
-             
-        public bool IsDeleted { get; set; }
 
-        public bool IsNew { get;set; }
-
+        [BsonIgnore]
         public EntityLook Look
         {
             get
@@ -63,29 +53,28 @@ namespace Burning.Common.Entity
             }
         }
 
+        [BsonIgnore]
         public List<CharacterOrnament> CharacterOrnament
         {
             get
             {
-                return CharacterOrnamentRepository.Instance.List.FindAll(x => x.CharacterId == this.Id);
+                return CharacterOrnamentRepository.Instance.GetOrnamentsByCharacter(this);
             }
         }
 
+        [BsonIgnore]
         public List<CharacterTitle> CharacterTitle
         {
             get
             {
-                return CharacterTitleRepository.Instance.List.FindAll(x => x.CharacterId == this.Id);
+                return CharacterTitleRepository.Instance.GetTitlesByCharacter(this);
             }
         }
 
-        private Look look { get; set; }
 
-
-        public Character() : base()
+        public Character()
         {
-            this.IsDeleted = false;
-            this.IsNew = false;
+            
         }
 
         public GameRolePlayCharacterInformations GetGameRolePlayCharacterInformations()
