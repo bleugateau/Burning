@@ -14,12 +14,12 @@ using Burning.DofusProtocol.Data.D2P.Elements;
 using System.IO.Compression;
 using System.IO;
 using FlatyBot.Common.IO;
-using Org.BouncyCastle.Utilities.Zlib;
 using System.Linq;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
 using System.Threading.Tasks;
 using Burning.Emu.World.Game.World;
+using Burning.Emu.World.Repository;
 
 namespace Burning.Emu.World.Frames
 {

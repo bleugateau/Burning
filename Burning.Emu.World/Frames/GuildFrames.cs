@@ -12,6 +12,8 @@ using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Game.Guild;
 using Burning.DofusProtocol.Datacenter;
 using Burning.Common.Managers.Database;
+using Burning.Emu.World.Repository;
+using Burning.Emu.World.Entity;
 
 namespace Burning.Emu.World.Frames
 {

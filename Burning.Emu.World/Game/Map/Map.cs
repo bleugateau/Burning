@@ -10,6 +10,7 @@ using Burning.Common.Repository;
 using Burning.Emu.World.Network;
 using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
+using Burning.Emu.World.Repository;
 
 namespace Burning.Emu.World.Game.Map
 {

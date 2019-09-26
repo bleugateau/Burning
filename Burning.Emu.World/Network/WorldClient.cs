@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using Burning.Emu.World.Entity;
 
 namespace Burning.Emu.World.Network
 {

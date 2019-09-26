@@ -6,6 +6,9 @@ using Burning.Emu.World.Network;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Burning.Common.Utility.EntityLook;
+using Burning.Common.Repository;
+using Burning.Emu.World.Repository;
 
 namespace Burning.Emu.World.Frames
 {
@@ -14,12 +17,41 @@ namespace Burning.Emu.World.Frames
         [PacketId(ObjectSetPositionMessage.Id)]
         public void ObjectSetPositionMessageFrame(WorldClient client, ObjectSetPositionMessage objectSetPositionMessage)
         {
-            switch((CharacterInventoryPositionEnum)objectSetPositionMessage.position)
+            var character = client.ActiveCharacter;
+            var item = InventoryRepository.Instance.GetItemFromUID(character.Inventory, (int)objectSetPositionMessage.objectUID);
+
+            if (item == null)
+                return;
+
+            switch ((CharacterInventoryPositionEnum)objectSetPositionMessage.position)
             {
+                case CharacterInventoryPositionEnum.INVENTORY_POSITION_COSTUME:
+                    if (item.typeId != 199)
+                        return;
+
+                    InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
+                    break;
+                case CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT:
+                    if (item.typeId != 16)
+                        return;
+
+                    InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
+                    break;
+                case CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE:
+
+                    if (item.typeId == 81 || item.typeId == 17) //cape et sac
+                    {
+                        InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
+                    }
+                    break;
                 case CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED:
-                    client.SendPacket(new ObjectMovementMessage(objectSetPositionMessage.objectUID, objectSetPositionMessage.position));
+                    InventoryRepository.Instance.UnequipItem(client, client.ActiveCharacter.Inventory, (int)objectSetPositionMessage.objectUID);
                     break;
             }
+
+            //update du skin
+            client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
+            client.SendPacket(new GameContextRefreshEntityLookMessage((double)client.ActiveCharacter.Id, client.ActiveCharacter.Look));
         }
     }
 }

@@ -51,9 +51,11 @@ namespace Burning.Common.Repository
         {
             var npc = this.List.Find(x => x.Id == npcId);
 
-            if(!lazy || npc == null)
+            if (!lazy || npc == null)
+            {
                 npc = this.Collection.Find(Builders<Npc>.Filter.Eq("_id", npcId)).Limit(1).FirstOrDefault();
-
+                this.List.Add(npc);
+            }
 
             return npc;
         }

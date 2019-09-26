@@ -45,13 +45,13 @@
               "target": "Package",
               "version": "[2.0.4, )"
             },
+            "Microsoft.CSharp": {
+              "target": "Package",
+              "version": "[4.6.0, )"
+            },
             "MongoDB.Driver": {
               "target": "Package",
               "version": "[2.9.1, )"
-            },
-            "MySql.Data": {
-              "target": "Package",
-              "version": "[8.0.17, )"
             },
             "NETStandard.Library": {
               "suppressParent": "All",

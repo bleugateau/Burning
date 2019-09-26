@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Burning.Emu.World.Repository;
 
 namespace Burning.Emu.World.Game.Map
 {

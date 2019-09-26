@@ -1,4 +1,7 @@
 ﻿using Burning.Common.Managers.Singleton;
+using Burning.DofusProtocol.Datacenter;
+using Burning.DofusProtocol.Network.Types;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -23,6 +26,9 @@ namespace Burning.Common.Managers.Database
             this.Realm = this.MongoClient.GetDatabase("burning");
             this.World = this.MongoClient.GetDatabase("burning_world");
             this.DataCenter = this.MongoClient.GetDatabase("burning_datacenter");
+
+            BsonClassMap.RegisterClassMap<EffectInstanceDice>();
+            BsonClassMap.RegisterClassMap<ObjectEffectInteger>();
         }
 
         public int AutoIncrement<T>(IMongoCollection<T> collection)

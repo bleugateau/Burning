@@ -12,6 +12,8 @@ using Burning.DofusProtocol.Network.Types;
 using System.Linq;
 using Burning.Emu.World.Game.World;
 using Burning.Common.Managers.Database;
+using Burning.Emu.World.Repository;
+using Burning.Emu.World.Entity;
 
 namespace Burning.Emu.World.Frames
 {
@@ -45,11 +47,12 @@ namespace Burning.Emu.World.Frames
 
                 foreach (var member in character.Guild.GuildMembers)
                 {
-                    DatabaseManager.Instance.Delete<Burning.Common.Entity.GuildMember>(GuildMemberRepository.Instance.Collection, member);
+                    DatabaseManager.Instance.Delete<Burning.Emu.World.Entity.GuildMember>(GuildMemberRepository.Instance.Collection, member);
                 }
                 DatabaseManager.Instance.Delete<Guild>(GuildRepository.Instance.Collection, guild);
-
             }
+
+            DatabaseManager.Instance.Delete<Inventory>(InventoryRepository.Instance.Collection, character.Inventory);
             DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
 
             this.SendCharacterListMessage(client);
@@ -97,7 +100,20 @@ namespace Burning.Emu.World.Frames
                 EntityLook = look.GetDatas()
             };
 
-            CharacterRepository.Instance.Insert(character);
+            CharacterRepository.Instance.Insert(character); //creation of character
+
+
+            var item = ItemRepository.Instance.GetItemDataById(1467);
+            //item.possibleEffects
+
+            Inventory inventory = new Inventory()
+            {
+                Id = DatabaseManager.Instance.AutoIncrement<Inventory>(InventoryRepository.Instance.Collection),
+                CharacterId = character.Id,
+                ObjectItems = new List<ObjectItem>() { InventoryRepository.Instance.GenerateItemFromId(14076)  }
+            };
+
+            InventoryRepository.Instance.Insert(inventory); //creation of inventory
 
             client.SendPacket(new CharacterCreationResultMessage((uint)CharacterCreationResultEnum.OK));
             this.SendCharacterListMessage(client, true);
@@ -186,14 +202,7 @@ namespace Burning.Emu.World.Frames
             client.SendPacket(new CharacterSelectedSuccessMessage(new Burning.DofusProtocol.Network.Types.CharacterBaseInformations(client.ActiveCharacter.Id, client.ActiveCharacter.Name, (uint)client.ActiveCharacter.Level, client.ActiveCharacter.Look, client.ActiveCharacter.Breed, client.ActiveCharacter.Sex), false));
             client.SendPacket(new SpellListMessage(true, new List<Burning.DofusProtocol.Network.Types.SpellItem>()));
             client.SendPacket(new ShortcutBarContentMessage((uint)ShortcutBarEnum.GENERAL_SHORTCUT_BAR, new List<Burning.DofusProtocol.Network.Types.Shortcut>()));
-            client.SendPacket(new InventoryContentMessage(new List<Burning.DofusProtocol.Network.Types.ObjectItem>()
-            {
-                new ObjectItem(3, 1487, new List<ObjectEffect>(){
-                    new ObjectEffectInteger(27, 124)
-
-                }, 100, 1)
-            }
-                , 0));
+            client.SendPacket(new InventoryContentMessage(client.ActiveCharacter.Inventory.ObjectItems, 0));
             client.SendPacket(new PresetsMessage(new List<Preset>()));
             client.SendPacket(new RoomAvailableUpdateMessage(1));
             client.SendPacket(new HavenBagPackListMessage(new List<int>() { 1, 2, 3, 4, 5, 6 }));

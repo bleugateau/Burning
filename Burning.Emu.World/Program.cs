@@ -17,6 +17,7 @@ using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.Command;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Game.Guild;
+using Burning.Emu.World.Repository;
 
 namespace Burning.Emu.World
 {
@@ -32,6 +33,7 @@ namespace Burning.Emu.World
             
             AccountRepository.Instance.Initialize("account");
             CharacterRepository.Instance.Initialize("character");
+            InventoryRepository.Instance.Initialize("inventory");
 
             BreedRepository.Instance.Initialize("breeds");
             Console.WriteLine("{0} breed(s) loaded from d2o.", BreedRepository.Instance.List.Count);

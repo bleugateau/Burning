@@ -32,9 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlatyBot.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Developpement\C#\Burning2.52\Burning.Emu\bin\Debug\netcoreapp2.1\FlatyBot.Common.dll</HintPath>
+    <Reference Include="FlatyBot.Common">
+      <HintPath>..\..\..\..\Downloads\2.52\FlatyBot.Common.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Core" />

@@ -1,5 +1,6 @@
 ﻿using Burning.Common.Entity;
 using Burning.Common.Managers.Singleton;
+using Burning.Emu.World.Entity;
 using Burning.Emu.World.Game.World;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Burning.Emu.World.Game.Guild
             //this.GuildInvitations = new List<GuildInvitation>();
         }
 
-        public List<Burning.DofusProtocol.Network.Types.GuildMember> GetGuildMembers(Burning.Common.Entity.Guild guild)
+        public List<Burning.DofusProtocol.Network.Types.GuildMember> GetGuildMembers(Burning.Emu.World.Entity.Guild guild)
         {
             List<Burning.DofusProtocol.Network.Types.GuildMember> guildMembers = new List<DofusProtocol.Network.Types.GuildMember>();
             foreach (var member in guild.GuildMembers)

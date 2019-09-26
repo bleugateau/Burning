@@ -1,4 +1,5 @@
 ﻿using Burning.Common.Entity;
+using Burning.Emu.World.Entity;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Network;
 using System;
