@@ -43,10 +43,11 @@ namespace Burning.Emu.World.Game.Command.Commands
 
                         var inventory = Client.ActiveCharacter.Inventory;
 
-                        inventory.ObjectItems.Add(InventoryRepository.Instance.GenerateItemFromId(itemId));
+                        var generatedItem = InventoryRepository.Instance.GenerateItemFromId(itemId);
+                        inventory.ObjectItems.Add(generatedItem);
                         InventoryRepository.Instance.Update(inventory);
 
-                        this.Client.SendPacket(new ChatServerMessage(10, "Item <b>[" + itemId + "]</b> has been added to your inventory.", 0, "", 0, "", "", 0));
+                        this.Client.SendPacket(new ObjectAddedMessage(generatedItem, 1));
                     }
                     catch(Exception ex)
                     {

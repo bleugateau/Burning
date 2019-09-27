@@ -32,13 +32,12 @@ namespace Burning.Emu.World.Frames
                     InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
                     break;
                 case CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT:
-                    if (item.typeId != 16)
-                        return;
-
-                    InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
+                    if (item.typeId == 16 || item.typeId == 177)
+                    {
+                        InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position, item.typeId == 177 ? true : false);
+                    }
                     break;
                 case CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE:
-
                     if (item.typeId == 81 || item.typeId == 17) //cape et sac
                     {
                         InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
@@ -50,6 +49,17 @@ namespace Burning.Emu.World.Frames
             }
 
             //update du skin
+            client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
+            client.SendPacket(new GameContextRefreshEntityLookMessage((double)client.ActiveCharacter.Id, client.ActiveCharacter.Look));
+        }
+
+        [PacketId(WrapperObjectDissociateRequestMessage.Id)]
+        public void WrapperObjectDissociateRequestMessageFrame(WorldClient client, WrapperObjectDissociateRequestMessage wrapperObjectDissociateRequestMessage)
+        {
+            if (client.ActiveCharacter == null)
+                return;
+
+            InventoryRepository.Instance.DissociateApparart(client, (int)wrapperObjectDissociateRequestMessage.hostUID);
             client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
             client.SendPacket(new GameContextRefreshEntityLookMessage((double)client.ActiveCharacter.Id, client.ActiveCharacter.Look));
         }

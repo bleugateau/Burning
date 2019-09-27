@@ -103,14 +103,11 @@ namespace Burning.Emu.World.Frames
             CharacterRepository.Instance.Insert(character); //creation of character
 
 
-            var item = ItemRepository.Instance.GetItemDataById(1467);
-            //item.possibleEffects
-
             Inventory inventory = new Inventory()
             {
                 Id = DatabaseManager.Instance.AutoIncrement<Inventory>(InventoryRepository.Instance.Collection),
                 CharacterId = character.Id,
-                ObjectItems = new List<ObjectItem>() { InventoryRepository.Instance.GenerateItemFromId(14076)  }
+                ObjectItems = new List<ObjectItem>()
             };
 
             InventoryRepository.Instance.Insert(inventory); //creation of inventory
@@ -202,7 +199,7 @@ namespace Burning.Emu.World.Frames
             client.SendPacket(new CharacterSelectedSuccessMessage(new Burning.DofusProtocol.Network.Types.CharacterBaseInformations(client.ActiveCharacter.Id, client.ActiveCharacter.Name, (uint)client.ActiveCharacter.Level, client.ActiveCharacter.Look, client.ActiveCharacter.Breed, client.ActiveCharacter.Sex), false));
             client.SendPacket(new SpellListMessage(true, new List<Burning.DofusProtocol.Network.Types.SpellItem>()));
             client.SendPacket(new ShortcutBarContentMessage((uint)ShortcutBarEnum.GENERAL_SHORTCUT_BAR, new List<Burning.DofusProtocol.Network.Types.Shortcut>()));
-            client.SendPacket(new InventoryContentMessage(client.ActiveCharacter.Inventory.ObjectItems, 0));
+            client.SendPacket(new InventoryContentMessage(InventoryRepository.Instance.GetStackedItem(client.ActiveCharacter.Inventory), 0));
             client.SendPacket(new PresetsMessage(new List<Preset>()));
             client.SendPacket(new RoomAvailableUpdateMessage(1));
             client.SendPacket(new HavenBagPackListMessage(new List<int>() { 1, 2, 3, 4, 5, 6 }));
