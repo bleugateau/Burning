@@ -81,6 +81,7 @@ namespace Burning.Emu.World.Frames
 
             //check si il a le droit d'inviter a faire
             var member = client.ActiveCharacter.Guild.GuildMembers.Find(x => x.Character.Id == client.ActiveCharacter.Id);
+            var guild = client.ActiveCharacter.Guild;
 
             if (!member.GuildRightsItemCriterion[GuildRightsBitEnum.GUILD_RIGHT_INVITE_NEW_MEMBERS])
             {
@@ -97,7 +98,7 @@ namespace Burning.Emu.World.Frames
             GuildManager.Instance.AddGuildInvitations(new GuildInvitation(client.ActiveCharacter.Guild.Id, client.ActiveCharacter.Id, target.ActiveCharacter.Id));
 
             client.SendPacket(new GuildInvitationStateRecruterMessage(target.ActiveCharacter.Name, (uint)SocialGroupInvitationStateEnum.SOCIAL_GROUP_INVITATION_SENT));
-            target.SendPacket(new GuildInvitedMessage(client.ActiveCharacter.Id, client.ActiveCharacter.Name, client.ActiveCharacter.Guild.GetGuildInformations()));
+            target.SendPacket(new GuildInvitedMessage(client.ActiveCharacter.Id, client.ActiveCharacter.Name, new DofusProtocol.Network.Types.BasicGuildInformations((uint)guild.Id, guild.Name, (uint)guild.Level)));
         }
 
 
@@ -111,7 +112,7 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter.Guild != null || invitation == null)
                 return;
 
-            var senderClient = WorldManager.Instance.GetClientFromCharacter(CharacterRepository.Instance.GetCharacterById(client.ActiveCharacter.Id));
+            var senderClient = WorldManager.Instance.GetClientFromCharacter(CharacterRepository.Instance.GetCharacterById(invitation.SenderId));
 
             if (guildInvitationAnswerMessage.accept)
             {
@@ -126,6 +127,8 @@ namespace Burning.Emu.World.Frames
                 GuildMemberRepository.Instance.Insert(guildMember);
 
                 senderClient.SendPacket(new GuildInvitationStateRecrutedMessage((uint)SocialGroupInvitationStateEnum.SOCIAL_GROUP_INVITATION_OK));
+
+                client.SendPacket(new GuildJoinedMessage(client.ActiveCharacter.Guild.GetGuildInformations(), (uint)guildMember.Role));
             }
             else
             {
@@ -133,6 +136,10 @@ namespace Burning.Emu.World.Frames
             }
 
             GuildManager.Instance.RemoveGuildInvitation(client.ActiveCharacter);
+
+            //close panel
+            senderClient.SendPacket(new LeaveDialogMessage(4));
+            client.SendPacket(new LeaveDialogMessage(4));
         }
 
         [PacketId(GuildKickRequestMessage.Id)]

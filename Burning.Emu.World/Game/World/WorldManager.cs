@@ -2,6 +2,7 @@
 using Burning.Common.Managers.Database;
 using Burning.Common.Managers.Singleton;
 using Burning.Common.Repository;
+using Burning.DofusProtocol.Network.Messages;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Network;
 using System;
@@ -26,88 +27,15 @@ namespace Burning.Emu.World.Game.World
 
         public void Initialize()
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-
-            Task.Run(() => this.SaveWorld());
+            //todo
         }
 
-        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        public void UpdateRolePlayActor(Character character)
         {
-            this.SaveWorld();
-        }
-
-        private void SaveWorld()
-        {
-            this.timer = new System.Timers.Timer(25000);
-            // Hook up the Elapsed event for the timer. 
-            this.timer.Elapsed += Timer_Elapsed;
-            this.timer.AutoReset = true;
-            this.timer.Enabled = true;
-        }
-
-
-        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            /*
-            foreach (var character in CharacterRepository.Instance.List)
+            foreach (var otherCharacter in this.GetNearestClientsFromCharacter(character))
             {
-                if (character.IsNew)
-                {
-                    CharacterRepository.Instance.Insert(character);
-                    character.IsNew = false;
-                }
-                else
-                {
-                    CharacterRepository.Instance.Update(character);
-                }
-
-                if (character.IsDeleted)
-                {
-                    DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
-                }
+                otherCharacter.SendPacket(new GameRolePlayShowActorMessage(character.GetGameRolePlayCharacterInformations()));
             }
-            */
-            /*
-            foreach(var guild in GuildRepository.Instance.List)
-            {
-                if(guild.IsNew)
-                {
-                    GuildRepository.Instance.Add(guild);
-                    guild.IsNew = false;
-                }
-                else
-                {
-                    GuildRepository.Instance.Update(guild);
-                }
-
-                if(guild.IsDeleted)
-                {
-                    GuildRepository.Instance.Accessor.Delete<Burning.Common.Entity.Guild>(guild);
-                }
-            }
-            */
-
-            /*
-            foreach (var member in GuildMemberRepository.Instance.List)
-            {
-                if (member.IsNew)
-                {
-                    GuildMemberRepository.Instance.Add(member);
-                    member.IsNew = false;
-                }
-                else
-                {
-                    GuildMemberRepository.Instance.Update(member);
-                }
-
-                if (member.IsDeleted)
-                {
-                    GuildMemberRepository.Instance.Accessor.Delete<GuildMember>(member);
-                }
-            }
-            */
-
-            Console.WriteLine("World saved !");
         }
 
         public List<WorldClient> GetNearestClientsFromCharacter(Character character)
@@ -123,7 +51,7 @@ namespace Burning.Emu.World.Game.World
             if (character == null)
                 return null;
 
-            return this.worldClients.Find(x => x.ActiveCharacter.Id == character.Id);
+            return this.worldClients.Find(x => x.ActiveCharacter != null && x.ActiveCharacter.Id == character.Id);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Text;
 using Burning.Common.Utility.EntityLook;
 using Burning.Common.Repository;
 using Burning.Emu.World.Repository;
+using Burning.Emu.World.Game.World;
 
 namespace Burning.Emu.World.Frames
 {
@@ -49,8 +50,7 @@ namespace Burning.Emu.World.Frames
             }
 
             //update du skin
-            client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
-            client.SendPacket(new GameContextRefreshEntityLookMessage((double)client.ActiveCharacter.Id, client.ActiveCharacter.Look));
+            this.SendInventoryWeight(client);
         }
 
         [PacketId(WrapperObjectDissociateRequestMessage.Id)]
@@ -59,9 +59,18 @@ namespace Burning.Emu.World.Frames
             if (client.ActiveCharacter == null)
                 return;
 
-            InventoryRepository.Instance.DissociateApparart(client, (int)wrapperObjectDissociateRequestMessage.hostUID);
+            InventoryRepository.Instance.DissociateApparat(client, (int)wrapperObjectDissociateRequestMessage.hostUID);
+
+            //update du skin
+            this.SendInventoryWeight(client);
+        }
+
+        private void SendInventoryWeight(WorldClient client)
+        {
             client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
             client.SendPacket(new GameContextRefreshEntityLookMessage((double)client.ActiveCharacter.Id, client.ActiveCharacter.Look));
+
+            WorldManager.Instance.UpdateRolePlayActor(client.ActiveCharacter);
         }
     }
 }

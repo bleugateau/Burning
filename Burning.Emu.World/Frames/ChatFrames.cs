@@ -39,7 +39,7 @@ namespace Burning.Emu.World.Frames
                     case ChatChannelsMultiEnum.CHANNEL_GUILD:
                         if (client.ActiveCharacter.Guild != null)
                         {
-                            foreach(var othersClient in WorldManager.Instance.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter != client.ActiveCharacter && x.ActiveCharacter.Guild == client.ActiveCharacter.Guild))
+                            foreach(var othersClient in WorldManager.Instance.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.Id != client.ActiveCharacter.Id && x.ActiveCharacter.Guild.Id == client.ActiveCharacter.Guild.Id))
                                 othersClient.SendPacket(new ChatServerMessage((uint)ChatChannelsMultiEnum.CHANNEL_GUILD, chatClientMultiMessage.content, 0, client.ActiveCharacter.Name, client.ActiveCharacter.Id, client.ActiveCharacter.Name, "", (uint)client.Account.Id));
 
                             client.SendPacket(new ChatServerMessage((uint)ChatChannelsMultiEnum.CHANNEL_GUILD, chatClientMultiMessage.content, 0, client.ActiveCharacter.Name, client.ActiveCharacter.Id, client.ActiveCharacter.Name, "", (uint)client.Account.Id));

@@ -49,32 +49,8 @@ namespace Burning.Emu.World.Frames
             List<StatedElement> statedElements = new List<StatedElement>();
            
             List<uint> elementIds = new List<uint>();
-            /*
-            foreach (var layer in map.MapData.Layers)
-            {
-                foreach (var cell in layer.Cells)
-                {
-                    foreach (var element in cell.Elements)
-                    {
-                        if (element is GraphicalElement)
-                        {
-                            var loc = (GraphicalElement)element;
-                            if (loc.Identifier != 0 && loc.ElementId != 0)
-                            {
-                                var ele = ElementsEleRepository.Instance.List.FirstOrDefault(x => x.GfxId == loc.ElementId);
-                                if (ele != null)
-                                {
-                                    interactiveElements.Add(new InteractiveElement((uint)loc.Identifier, ele.TypeId, new List<InteractiveElementSkill>() { new InteractiveElementSkill(114, 123) }, new List<InteractiveElementSkill>(), true));
-                                    statedElements.Add(new StatedElement((uint)loc.Identifier, (uint)loc.Cell.CellId, (uint)2, true));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            */
+            
 
-            //
             List<GameRolePlayActorInformations> gameRolePlayActorInformations = new List<GameRolePlayActorInformations>();
             foreach(var otherCharacter in WorldManager.Instance.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.MapId == client.ActiveCharacter.MapId))
             {

@@ -236,7 +236,7 @@ namespace Burning.Emu.World.Repository
             CharacterRepository.Instance.Update(client.ActiveCharacter);
         }
 
-        public void DissociateApparart(WorldClient client, int uid)
+        public void DissociateApparat(WorldClient client, int uid)
         {
             var inventory = client.ActiveCharacter.Inventory;
             var item = inventory.ObjectItems.Find(x => x.objectUID == uid);
