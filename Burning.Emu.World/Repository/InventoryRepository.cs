@@ -313,7 +313,6 @@ namespace Burning.Emu.World.Repository
             var itemTemplate = this.GetItemFromUID(inventory, uid);
             uint appartSkin = GetItemApparatSkinId(item);
 
-
             if (item == null || itemTemplate == null)
                 return;
 
@@ -321,6 +320,9 @@ namespace Burning.Emu.World.Repository
                 return;
 
             if (apparat && item.TypeId != itemInThisPosition.TypeId)
+                return;
+
+            if (apparat && itemInThisPosition.effects.Find(x => x.actionId == 1176) != null) //si posséde déjà un apparat
                 return;
             
             //bool isStackedItem = IsStacked(inventory, (int)item.objectGID); //check stacked item
@@ -357,8 +359,6 @@ namespace Burning.Emu.World.Repository
 
             this.Update(inventory);
 
-            //remove ancien skin OK :)
-            //déplacer item de l'inventaire enlever ancien OK :)
             //gérer les stats des items BIENTOT QUAND INVENTAIRE BIEN ENTAMER
             if (itemTemplate.appearanceId != 0 && !apparat)
             {
