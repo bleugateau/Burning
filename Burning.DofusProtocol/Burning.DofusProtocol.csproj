@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\D2o\other\IdolsPresetIcon.cs" />
+    <Compile Include="Enums\EffectsEnum.cs" />
     <Compile Include="Network\BooleanByteWrapper.cs" />
     <Compile Include="Network\ConnectionPasswordMessage.cs" />
     <Compile Include="Network\ConnectionResponceMessage.cs" />

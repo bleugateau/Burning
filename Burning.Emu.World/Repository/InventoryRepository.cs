@@ -216,7 +216,9 @@ namespace Burning.Emu.World.Repository
                 //car faut enlever l'ancien aussi
                 look.RemoveSkin(itemInThisPositionTemplate.appearanceId);
             }
-                
+
+            //remove effect of item
+            CharacterCharacteristicRepository.Instance.ApplyEffects(client.ActiveCharacter, item.effects, true);
 
             //objetmovementmessage a 63
             if (objectItemsStack.Count != 0)
@@ -370,6 +372,9 @@ namespace Burning.Emu.World.Repository
                     look.AddSkin(itemTemplate.appearanceId);
 
                 client.ActiveCharacter.EntityLook = look.GetDatas();
+
+                //add effect of item
+                CharacterCharacteristicRepository.Instance.ApplyEffects(client.ActiveCharacter, item.effects);
 
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
             }

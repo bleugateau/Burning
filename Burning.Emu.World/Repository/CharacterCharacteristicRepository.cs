@@ -2,10 +2,12 @@
 using Burning.Common.Managers.Singleton;
 using Burning.Common.Repository;
 using Burning.DofusProtocol.Enums;
+using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Burning.Emu.World.Repository
@@ -77,6 +79,58 @@ namespace Burning.Emu.World.Repository
             return characteristicBase;
         }
 
+
+        public void ApplyEffects(Character character, List<ObjectEffect> effects, bool deApply = false)
+        {
+            var characteristic = character.Characteristics;
+
+            foreach(var effect in effects.Select(x => (ObjectEffectInteger)x))
+            {
+                //EffectsEnum
+
+                switch((EffectsEnum)effect.actionId)
+                {
+                    case EffectsEnum.Effect_AddStrength:
+                        if(!deApply)
+                            characteristic.strength.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.strength.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddChance:
+                        if (!deApply)
+                            characteristic.chance.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.chance.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddAgility:
+                        if (!deApply)
+                            characteristic.agility.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.agility.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddHealth:
+                        if (!deApply)
+                            characteristic.healBonus.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.healBonus.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddIntelligence:
+                        if (!deApply)
+                            characteristic.intelligence.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.intelligence.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddWisdom:
+                        if (!deApply)
+                            characteristic.wisdom.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.wisdom.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                }
+            }
+
+            this.Update(characteristic);
+        }
         public bool StatsUpgradeRequestAction(Character character, uint boostPoint, uint statId)
         {
             //si pas le nombre suffisant

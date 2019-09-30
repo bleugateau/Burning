@@ -11,6 +11,8 @@ using Burning.Emu.World.Network;
 using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Repository;
+using Burning.Common.Utility.EntityLook;
+using Burning.Emu.World.Game.Monster;
 
 namespace Burning.Emu.World.Game.Map
 {
@@ -24,16 +26,57 @@ namespace Burning.Emu.World.Game.Map
 
         public List<StatedElement> StatedElementList { get; set; }
 
+        public List<MonsterGroup> MonstersGroups { get; set; }
+
         public Burning.DofusProtocol.Data.D2P.Map MapData { get; set; }
 
-        public Map(int mapId, Burning.DofusProtocol.Data.D2P.Map mapData)
+        private int MonsterGroupsLimit { get; set; }
+
+        public Map(int mapId, Burning.DofusProtocol.Data.D2P.Map mapData, int monsterGroupsLimit = 3)
         {
             this.Id = mapId;
             this.MapData = mapData;
             this.NpcSpawnList = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(mapId);
+            this.MonsterGroupsLimit = monsterGroupsLimit;
+            this.MonstersGroups = FillMonstersGroups();
 
             this.InteractiveElementList = new List<InteractiveElement>(); //a fill avec la db
             this.StatedElementList = new List<StatedElement>(); //a fill avec la db
+        }
+
+        public List<MonsterGroup> FillMonstersGroups()
+        {
+            Random random = new Random();
+
+            List<MonsterGroup> groupMonsters = new List<MonsterGroup>();
+            var monsterInSubarea = MonsterRepository.Instance.GetMonstersFromSubarea((uint)this.MapData.SubAreaId);
+
+
+            for(int i = 0; i < this.MonsterGroupsLimit; i++)
+            {
+                int numberOfMonster = random.Next(1, 8 + 1);
+                var groupStatic = new GroupMonsterStaticInformations();
+                
+                groupStatic.underlings = new List<MonsterInGroupInformations>();
+
+                for (int m = 0; m < numberOfMonster; m++)
+                {
+                    int monsterNum = random.Next(1, monsterInSubarea.Count);
+                    if (m == 0)
+                    {
+                        groupStatic.mainCreatureLightInfos = new MonsterInGroupLightInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level);
+                    }
+                    else
+                    {
+                        groupStatic.underlings.Add(new MonsterInGroupInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level, Look.Parse(monsterInSubarea[monsterNum].Look).GetEntityLook()));
+                    }
+                }
+
+                var group = new GameRolePlayGroupMonsterInformations((random.Next(1, 99999999) * (this.Id / 2)), new EntityDispositionInformations(random.Next(100, 342), 4), Look.Parse(monsterInSubarea[0].Look).GetEntityLook(), groupStatic, 0, 255, false, false, false);
+                groupMonsters.Add(new MonsterGroup((int)group.contextualId, this, group));
+            }
+
+            return groupMonsters;
         }
 
         public void ReloadNpc()

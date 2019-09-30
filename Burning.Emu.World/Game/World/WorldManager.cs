@@ -38,6 +38,11 @@ namespace Burning.Emu.World.Game.World
             }
         }
 
+        public List<WorldClient> GetClientsOnMapId(int mapId)
+        {
+            return this.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.MapId == mapId);
+        }
+
         public List<WorldClient> GetNearestClientsFromCharacter(Character character)
         {
             if (character == null)

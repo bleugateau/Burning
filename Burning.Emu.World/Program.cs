@@ -44,8 +44,10 @@ namespace Burning.Emu.World
             GuildRepository.Instance.Initialize("guild");
 
             MapManager.Instance.Initialize("maps");
+            MonsterRepository.Instance.Initialize("monsters");
 
             MapTransitionsRepository.Instance.Initialize("maps_transitions");
+
 
             /*
             

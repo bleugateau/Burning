@@ -60,10 +60,17 @@ namespace Burning.Emu.World.Frames
 
             gameRolePlayActorInformations.Add(client.ActiveCharacter.GetGameRolePlayCharacterInformations());
 
+            //npc
             List<GameRolePlayActorInformations> gameRolePlayNpcs = new List<GameRolePlayActorInformations>();
             foreach(var npc in map.NpcSpawnList)
             {
                 gameRolePlayNpcs.Add(new GameRolePlayNpcInformations(npc.Id * -1, new EntityDispositionInformations(npc.CellId, (uint)npc.Orientation), Look.Parse(npc.EntityLook).GetEntityLook(), (uint)npc.NpcId, true, 1));
+            }
+
+            //monsters
+            foreach(var monsterGroup in map.MonstersGroups)
+            {
+                gameRolePlayNpcs.Add(monsterGroup.RolePlayGroupMonsterInformations);
             }
 
             client.SendPacket(new MapComplementaryInformationsDataMessage((uint)map.MapData.SubAreaId, client.ActiveCharacter.MapId, new List<HouseInformations>(), gameRolePlayActorInformations, interactiveElements,
