@@ -109,6 +109,7 @@ namespace Burning.Emu.World.Frames
                 Id = DatabaseManager.Instance.AutoIncrement<CharacterCharacteristic>(CharacterCharacteristicRepository.Instance.Collection),
                 CharacterId = character.Id,
                 CapitalPoint = 100,
+                LifeBase = 45,
                 fireElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
                 airElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
                 waterElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),

@@ -17,9 +17,6 @@ namespace Burning.Emu.World.Frames.Roleplay
         [PacketId(StatsUpgradeRequestMessage.Id)]
         public void StatsUpgradeRequestMessageFrame(WorldClient client, StatsUpgradeRequestMessage statsUpgradeRequestMessage)
         {
-            if (client.ActiveCharacter == null)
-                return;
-
             if(!CharacterCharacteristicRepository.Instance.StatsUpgradeRequestAction(client.ActiveCharacter, statsUpgradeRequestMessage.boostPoint, statsUpgradeRequestMessage.statId))
             {
                 client.SendPacket(new StatsUpgradeResultMessage((int)StatsUpgradeResultEnum.NOT_ENOUGH_POINT, 0));
@@ -28,6 +25,13 @@ namespace Burning.Emu.World.Frames.Roleplay
             }
 
             client.SendPacket(new StatsUpgradeResultMessage((int)StatsUpgradeResultEnum.SUCCESS, statsUpgradeRequestMessage.boostPoint));
+            client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
+        }
+
+        [PacketId(ResetCharacterStatsRequestMessage.Id)]
+        public void ResetCharacterStatsRequestMessageFrame(WorldClient client, ResetCharacterStatsRequestMessage resetCharacterStatsRequestMessage)
+        {
+            CharacterCharacteristicRepository.Instance.ResetCharacterStatsRequestAction(client.ActiveCharacter);
             client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
         }
     }

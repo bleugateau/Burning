@@ -15,6 +15,8 @@ namespace Burning.Emu.World.Entity
 
         public int UsedCapitalPoint { get; set; }
 
+        public int LifeBase { get; set; }
+
         public CharacterBaseCharacteristic fireElementReduction { get; set; }
         public CharacterBaseCharacteristic airElementReduction { get; set; }
         public CharacterBaseCharacteristic waterElementReduction { get; set; }

@@ -34,7 +34,23 @@ namespace Burning.Emu.World.Repository
             return this.Collection.Find(Builders<CharacterCharacteristic>.Filter.Eq("CharacterId", character.Id)).Limit(1).FirstOrDefault();
         }
 
-        public int CalculStats(List<List<uint>> statsPointForCharacteristic, int characteristicBase, uint boostPoint)
+        public void ResetCharacterStatsRequestAction(Character character)
+        {
+            var characteristics = character.Characteristics;
+
+            characteristics.agility.@base = 0;
+            characteristics.chance.@base = 0;
+            characteristics.intelligence.@base = 0;
+            characteristics.strength.@base = 0;
+            characteristics.vitality.@base = 0;
+            characteristics.wisdom.@base = 0;
+
+            characteristics.CapitalPoint += characteristics.UsedCapitalPoint;
+            characteristics.UsedCapitalPoint = 0;
+
+            this.Update(characteristics);
+        }
+        private int CalculStats(List<List<uint>> statsPointForCharacteristic, int characteristicBase, uint boostPoint)
         {
             int pointsUsed = 0;
             var statJalon = statsPointForCharacteristic[0];
