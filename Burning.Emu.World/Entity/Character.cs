@@ -83,6 +83,15 @@ namespace Burning.Emu.World.Entity
             }
         }
 
+        [BsonIgnore]
+        public CharacterCharacteristic Characteristics
+        {
+            get
+            {
+                return CharacterCharacteristicRepository.Instance.GetCharacteristicsByCharacter(this);
+            }
+        }
+
 
         public Character()
         {
@@ -104,6 +113,27 @@ namespace Burning.Emu.World.Entity
 
             HumanInformations humanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.Sex, humanOptions.ToArray());
             return new GameRolePlayCharacterInformations(this.Id, new EntityDispositionInformations(this.CellId, 2), this.Look, this.Name, humanInformations, (uint)this.AccountId, new ActorAlignmentInformations(0, 0, 0, 0));
+        }
+
+        public CharacterCharacteristicsInformations GetCharacterCharacteristicsInformations()
+        {
+            var characteristics = this.Characteristics;
+
+            ActorExtendedAlignmentInformations actorExtendedAlignment = new ActorExtendedAlignmentInformations(0, 0, 0, 0, 0, 0, 0, 0);
+
+
+            characteristics.initiative.@base = (characteristics.agility.@base + characteristics.chance.@base + characteristics.intelligence.@base + characteristics.strength.@base + characteristics.vitality.@base + characteristics.wisdom.@base);
+
+
+            return new CharacterCharacteristicsInformations(this.Experience, 0, 1000, 0, this.Kamas, (uint)characteristics.CapitalPoint, 0, 0, actorExtendedAlignment,
+                45, 45, 5000, 10000, 6, 3, characteristics.initiative, characteristics.prospecting, characteristics.actionPoints, characteristics.movementPoints, characteristics.strength, characteristics.vitality, characteristics.wisdom, characteristics.chance, characteristics.agility, characteristics.intelligence, characteristics.range, characteristics.summonableCreaturesBoost, characteristics.reflect, characteristics.criticalHit, 0,
+                characteristics.criticalMiss, characteristics.healBonus, characteristics.allDamagesBonus, characteristics.weaponDamagesBonusPercent, characteristics.damagesBonusPercent, characteristics.trapBonus, characteristics.trapBonusPercent, characteristics.glyphBonusPercent, characteristics.runeBonusPercent, characteristics.permanentDamagePercent,
+                characteristics.tackleBlock, characteristics.tackleEvade, characteristics.PAAttack, characteristics.PMAttack, characteristics.pushDamageBonus, characteristics.criticalDamageBonus, characteristics.neutralDamageBonus, characteristics.earthDamageBonus, characteristics.waterDamageBonus, characteristics.airDamageBonus, characteristics.fireDamageBonus, characteristics.dodgePALostProbability,
+                characteristics.dodgePMLostProbability, characteristics.neutralElementResistPercent, characteristics.earthElementResistPercent, characteristics.waterElementResistPercent, characteristics.airElementResistPercent, characteristics.fireElementResistPercent, characteristics.neutralElementReduction, characteristics.earthElementReduction,
+                characteristics.waterElementReduction, characteristics.airElementReduction, characteristics.fireElementReduction, characteristics.pushDamageReduction, characteristics.criticalDamageReduction, characteristics.pvpNeutralElementResistPercent, characteristics.pvpEarthElementResistPercent, characteristics.pvpWaterElementResistPercent,
+                characteristics.pvpAirElementResistPercent, characteristics.pvpFireElementResistPercent, characteristics.pvpNeutralElementReduction, characteristics.pvpEarthElementReduction, characteristics.pvpWaterElementReduction, characteristics.pvpAirElementReduction, characteristics.pvpFireElementReduction,
+                characteristics.meleeDamageDonePercent, characteristics.meleeDamageReceivedPercent, characteristics.rangedDamageDonePercent, characteristics.rangedDamageReceivedPercent, characteristics.weaponDamageDonePercent, characteristics.weaponDamageReceivedPercent, characteristics.spellDamageDonePercent,
+                characteristics.spellDamageReceivedPercent, new List<CharacterSpellModification>(), 0);
         }
 
     }

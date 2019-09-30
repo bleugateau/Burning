@@ -11,6 +11,7 @@ namespace Burning.Common.Entity
         public string Password { get; set; }
         public string SecretQuestion { get; set; }
         public string SecretAnswer { get; set; }
+        public string FlashKey { get; set; }
         public string Ticket { get; set; }
         public bool IsBanned { get; set; }
 

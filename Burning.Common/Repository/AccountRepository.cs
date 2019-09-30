@@ -24,7 +24,7 @@ namespace Burning.Common.Repository
 
         public void Update(Account entity)
         {
-            var updateFields = Builders<Account>.Update.Set("Ticket", entity.Ticket);
+            var updateFields = Builders<Account>.Update.Set("Ticket", entity.Ticket).Set("FlashKey", entity.FlashKey);
             this.Collection.UpdateOne(Builders<Account>.Filter.Eq(x => x.Id, entity.Id), updateFields);
         }
 

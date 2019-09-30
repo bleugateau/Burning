@@ -52,5 +52,15 @@ namespace Burning.Emu.Frames
             client.Account.Ticket = client.salt;
             AccountRepository.Instance.Update(client.Account);
         }
+
+        [PacketId(ClientKeyMessage.Id)]
+        public void ClientKeyMessageFrame(AuthClient client, ClientKeyMessage clientKeyMessage)
+        {
+            if (client.Account != null)
+            {
+                client.Account.FlashKey = clientKeyMessage.key;
+                AccountRepository.Instance.Update(client.Account);
+            }
+        }
     }
 }

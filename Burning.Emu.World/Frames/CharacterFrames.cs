@@ -52,6 +52,8 @@ namespace Burning.Emu.World.Frames
                 DatabaseManager.Instance.Delete<Guild>(GuildRepository.Instance.Collection, guild);
             }
 
+
+            DatabaseManager.Instance.Delete<CharacterCharacteristic>(CharacterCharacteristicRepository.Instance.Collection, character.Characteristics);
             DatabaseManager.Instance.Delete<Inventory>(InventoryRepository.Instance.Collection, character.Inventory);
             DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
 
@@ -102,6 +104,81 @@ namespace Burning.Emu.World.Frames
 
             CharacterRepository.Instance.Insert(character); //creation of character
 
+            CharacterCharacteristic characterCharacteristic = new CharacterCharacteristic()
+            {
+                Id = DatabaseManager.Instance.AutoIncrement<CharacterCharacteristic>(CharacterCharacteristicRepository.Instance.Collection),
+                CharacterId = character.Id,
+                CapitalPoint = 100,
+                fireElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                airElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                waterElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                earthElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                neutralElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                fireElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                airElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                waterElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pushDamageReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                earthElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                dodgePMLostProbability = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                dodgePALostProbability = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                fireDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                airDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                waterDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                earthDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                neutralDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                criticalDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                neutralElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                PMAttack = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                criticalDamageReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpEarthElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                spellDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                spellDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                weaponDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                weaponDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                rangedDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                rangedDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpNeutralElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                meleeDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpFireElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpAirElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpWaterElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpEarthElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpNeutralElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpFireElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpAirElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pvpWaterElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                meleeDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                PAAttack = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                pushDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                tackleBlock = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                actionPoints = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                prospecting = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                initiative = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                tackleEvade = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                strength = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                movementPoints = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                wisdom = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                permanentDamagePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                runeBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                glyphBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                trapBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                trapBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                damagesBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                vitality = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                allDamagesBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                healBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                weaponDamagesBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                criticalHit = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                reflect = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                summonableCreaturesBoost = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                range = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                intelligence = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                agility = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                chance = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                criticalMiss = new CharacterBaseCharacteristic(0, 0, 0, 0, 0)
+            };
+
+            CharacterCharacteristicRepository.Instance.Insert(characterCharacteristic);
 
             Inventory inventory = new Inventory()
             {
@@ -250,90 +327,8 @@ namespace Burning.Emu.World.Frames
             client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
             client.SendPacket(new FollowedQuestsMessage(new List<Burning.DofusProtocol.Network.Types.QuestActiveDetailedInformations>()));
 
-            //statistique du personnage
-            ActorExtendedAlignmentInformations actorExtendedAlignment = new ActorExtendedAlignmentInformations(0, 0, 0, 0, 0, 0, 0, 0);
-            #region stats
-
-            CharacterBaseCharacteristic fireElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic airElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic waterElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic earthElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic neutralElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic fireElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic airElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic waterElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pushDamageReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic earthElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic dodgePMLostProbability = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic dodgePALostProbability = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic fireDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic airDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic waterDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic earthDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic neutralDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic criticalDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic neutralElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic PMAttack = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic criticalDamageReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpEarthElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic spellDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic spellDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic weaponDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic weaponDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic rangedDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic rangedDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpNeutralElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic meleeDamageReceivedPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpFireElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpAirElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpWaterElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpEarthElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpNeutralElementReduction = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpFireElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpAirElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pvpWaterElementResistPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic meleeDamageDonePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic PAAttack = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic pushDamageBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic tackleBlock = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic actionPoints = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic prospecting = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic initiative = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic tackleEvade = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic strength = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic movementPoints = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic wisdom = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic permanentDamagePercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic runeBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic glyphBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic trapBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic trapBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic damagesBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic vitality = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic allDamagesBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic healBonus = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic weaponDamagesBonusPercent = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic criticalHit = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic reflect = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic summonableCreaturesBoost = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic range = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic intelligence = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic agility = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic chance = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-            CharacterBaseCharacteristic criticalMiss = new CharacterBaseCharacteristic(0, 0, 0, 0, 0);
-
-            #endregion
-
-            CharacterCharacteristicsInformations characterCharacteristics = new CharacterCharacteristicsInformations(client.ActiveCharacter.Experience, 0, 1000, 0, client.ActiveCharacter.Kamas, 0, 0, 0, actorExtendedAlignment,
-                45, 45, 5000, 10000, 6, 3, initiative, prospecting, actionPoints, movementPoints, strength, vitality, wisdom, chance, agility, intelligence, range, summonableCreaturesBoost, reflect, criticalHit, 0,
-                criticalMiss, healBonus, allDamagesBonus, weaponDamagesBonusPercent, damagesBonusPercent, trapBonus, trapBonusPercent, glyphBonusPercent, runeBonusPercent, permanentDamagePercent,
-                tackleBlock, tackleEvade, PAAttack, PMAttack, pushDamageBonus, criticalDamageBonus, neutralDamageBonus, earthDamageBonus, waterDamageBonus, airDamageBonus, fireDamageBonus, dodgePALostProbability,
-                dodgePMLostProbability, neutralElementResistPercent, earthElementResistPercent, waterElementResistPercent, airElementResistPercent, fireElementResistPercent, neutralElementReduction, earthElementReduction,
-                waterElementReduction, airElementReduction, fireElementReduction, pushDamageReduction, criticalDamageReduction, pvpNeutralElementResistPercent, pvpEarthElementResistPercent, pvpWaterElementResistPercent,
-                pvpAirElementResistPercent, pvpFireElementResistPercent, pvpNeutralElementReduction, pvpEarthElementReduction, pvpWaterElementReduction, pvpAirElementReduction, pvpFireElementReduction,
-                meleeDamageDonePercent, meleeDamageReceivedPercent, rangedDamageDonePercent, rangedDamageReceivedPercent, weaponDamageDonePercent, weaponDamageReceivedPercent, spellDamageDonePercent,
-                spellDamageReceivedPercent, new List<CharacterSpellModification>(), 0);
-            client.SendPacket(new CharacterStatsListMessage(characterCharacteristics));
+            
+            client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
 
 
             client.SendPacket(new SpouseStatusMessage(false));
