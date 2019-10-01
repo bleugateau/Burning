@@ -18,6 +18,7 @@ using Burning.Emu.World.Game.Command;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Game.Guild;
 using Burning.Emu.World.Repository;
+using Burning.Emu.World.Game.Fight.Positions;
 
 namespace Burning.Emu.World
 {
@@ -44,6 +45,7 @@ namespace Burning.Emu.World
             GuildRepository.Instance.Initialize("guild");
 
             MapManager.Instance.Initialize("maps");
+            FightPositionsManager.Instance.Initialize(); //map fight generator
             MonsterRepository.Instance.Initialize("monsters");
 
             MapTransitionsRepository.Instance.Initialize("maps_transitions");

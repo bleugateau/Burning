@@ -19,7 +19,7 @@ namespace Burning.Common.Repository
 
         public List<Monster> GetMonstersFromSubarea(uint subareaId)
         {
-            return this.Collection.Find(x => x.Subareas.Contains(subareaId)).ToList();
+            return this.Collection.Find(x => x.FavoriteSubareaId == subareaId && x.IsMiniBoss == false && x.Spells.Count != 0).Limit(5).ToList();
         }
 
         public void Insert(Monster entity)

@@ -74,7 +74,7 @@ namespace Burning.Emu.World.Frames
             }
 
             client.SendPacket(new MapComplementaryInformationsDataMessage((uint)map.MapData.SubAreaId, client.ActiveCharacter.MapId, new List<HouseInformations>(), gameRolePlayActorInformations, interactiveElements,
-                statedElements, new List<MapObstacle>(), new List<FightCommonInformations>(), true, new FightStartingPositions()));
+                statedElements, new List<MapObstacle>(), new List<FightCommonInformations>(), true, map.FightStartingPosition));
 
             client.SendPacket(new GameRolePlayShowMultipleActorsMessage(gameRolePlayNpcs));
             client.SendPacket(new SetCharacterRestrictionsMessage(client.ActiveCharacter.Id, new ActorRestrictionsInformations()));
@@ -113,10 +113,11 @@ namespace Burning.Emu.World.Frames
             if (replacedMap != null)
                 mapId = replacedMap.MapIdReplaced;
 
-            var map = MapManager.Instance.GetMap(mapId);
-
             if (!MapManager.Instance.CheckIfNextMapIsValid(client.ActiveCharacter.MapId, mapId, client.ActiveCharacter.CellId))
                 return;
+
+            var map = MapManager.Instance.GetMap(mapId);
+
 
             if (map != null)
             {
@@ -131,7 +132,7 @@ namespace Burning.Emu.World.Frames
                 client.ActiveCharacter.MapId = mapId;
                 client.SendPacket(new CurrentMapMessage(client.ActiveCharacter.MapId, "649ae451ca33ec53bbcbcc33becf15f4"));
 
-                client.ActiveCharacter.CellId = MapManager.Instance.CheckWalkableCell(mapId, MapManager.Instance.GetOppositeCellFromNeight(client.ActiveCharacter.CellId));
+                client.ActiveCharacter.CellId = MapManager.Instance.CheckWalkableCell(map, MapManager.Instance.GetOppositeCellFromNeight(client.ActiveCharacter.CellId));
 
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
             }

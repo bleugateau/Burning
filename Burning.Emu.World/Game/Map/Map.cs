@@ -13,6 +13,7 @@ using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Repository;
 using Burning.Common.Utility.EntityLook;
 using Burning.Emu.World.Game.Monster;
+using Burning.Emu.World.Game.Fight.Positions;
 
 namespace Burning.Emu.World.Game.Map
 {
@@ -30,6 +31,8 @@ namespace Burning.Emu.World.Game.Map
 
         public Burning.DofusProtocol.Data.D2P.Map MapData { get; set; }
 
+        public FightStartingPositions FightStartingPosition { get; private set; }
+
         private int MonsterGroupsLimit { get; set; }
 
         public Map(int mapId, Burning.DofusProtocol.Data.D2P.Map mapData, int monsterGroupsLimit = 3)
@@ -39,6 +42,8 @@ namespace Burning.Emu.World.Game.Map
             this.NpcSpawnList = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(mapId);
             this.MonsterGroupsLimit = monsterGroupsLimit;
             this.MonstersGroups = FillMonstersGroups();
+            this.FightStartingPosition = FightPositionsManager.Instance.BuildFromSchema(this);
+            //startfightposition a faire
 
             this.InteractiveElementList = new List<InteractiveElement>(); //a fill avec la db
             this.StatedElementList = new List<StatedElement>(); //a fill avec la db
@@ -51,8 +56,12 @@ namespace Burning.Emu.World.Game.Map
             List<MonsterGroup> groupMonsters = new List<MonsterGroup>();
             var monsterInSubarea = MonsterRepository.Instance.GetMonstersFromSubarea((uint)this.MapData.SubAreaId);
 
+            int actualMonsterGroupSize = this.MonstersGroups != null ? this.MonstersGroups.Count : 0;
 
-            for(int i = 0; i < this.MonsterGroupsLimit; i++)
+            if (monsterInSubarea.Count == 0)
+                return new List<MonsterGroup>();
+
+            for(int i = actualMonsterGroupSize; i < this.MonsterGroupsLimit; i++)
             {
                 int numberOfMonster = random.Next(1, 8 + 1);
                 var groupStatic = new GroupMonsterStaticInformations();

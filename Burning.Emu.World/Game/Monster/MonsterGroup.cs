@@ -24,19 +24,22 @@ namespace Burning.Emu.World.Game.Monster
 
         public MonsterGroup(int id, Map.Map map, GameRolePlayGroupMonsterInformations gameRolePlayGroupMonsterInformations)
         {
-            this.Id = id * -1;
+            this.Id = id;
             this.Map = map;
             this.Pathfinder = new Pathfinder(new int[] { });
             this.Pathfinder.SetMap(this.Map.MapData, true);
 
             this.RolePlayGroupMonsterInformations = gameRolePlayGroupMonsterInformations;
 
-            Task.Run(() => this.StartMovementTimer());
+            Console.WriteLine("MONSTER GROUP {0} SPAWNED. ", this.Id);
+
+            //movement
+            this.StartMovementTimer();
         }
 
         private void StartMovementTimer()
         {
-            this.MovementTimer = new System.Timers.Timer(10000);
+            this.MovementTimer = new System.Timers.Timer(7500);
             // Hook up the Elapsed event for the timer. 
             this.MovementTimer.Elapsed += MovementTimer_Elapsed;
             this.MovementTimer.AutoReset = true;
@@ -45,15 +48,15 @@ namespace Burning.Emu.World.Game.Monster
 
         private void MovementTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            var keyMovements = this.Pathfinder.GetCompressedPath((short)this.RolePlayGroupMonsterInformations.disposition.cellId, (short)(this.RolePlayGroupMonsterInformations.disposition.cellId + 1)).Select(x => (uint)x).ToList();
+            var keyMovements = this.Pathfinder.GetPath((short)this.RolePlayGroupMonsterInformations.disposition.cellId, (short)(this.RolePlayGroupMonsterInformations.disposition.cellId + 1)).Select(x => (uint)x.Id).ToList();
 
-            this.RolePlayGroupMonsterInformations.disposition.cellId += 1;
-
-            foreach (var client in WorldManager.Instance.GetClientsOnMapId(this.Map.Id))
+            foreach(var client in WorldManager.Instance.GetClientsOnMapId(this.Map.Id))
             {
                 //update
                 client.SendPacket(new GameMapMovementMessage(keyMovements, 2, this.Id));
             }
+
+            this.RolePlayGroupMonsterInformations.disposition.cellId = (int)keyMovements[keyMovements.Count - 1];
         }
     }
 }

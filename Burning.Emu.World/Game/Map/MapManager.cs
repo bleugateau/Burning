@@ -79,10 +79,8 @@ namespace Burning.Emu.World.Game.Map
             return false;
         }
 
-        public int CheckWalkableCell(int mapId, int cellId)
+        public int CheckWalkableCell(Map map, int cellId)
         {
-            var map = this.GetMap(mapId);
-
             var cellWalkable = map.MapData.Cells.ToList().FindAll(x => x.Walkable && x.isObstacle() != true);
             var cellData = map.MapData.Cells.ToList().FirstOrDefault(x => x.Id == cellId);
 
