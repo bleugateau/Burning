@@ -81,7 +81,7 @@ namespace Burning.Emu.World.Game.Map
                     }
                 }
 
-                var group = new GameRolePlayGroupMonsterInformations((random.Next(1, 99999999) * (this.Id / 2)), new EntityDispositionInformations(random.Next(100, 342), 4), Look.Parse(monsterInSubarea[0].Look).GetEntityLook(), groupStatic, 0, 255, false, false, false);
+                var group = new GameRolePlayGroupMonsterInformations((random.Next(1, 99999999) * (this.Id / 2)), new EntityDispositionInformations(MapManager.Instance.CheckWalkableCell(this, random.Next(100, 342)), 4), Look.Parse(monsterInSubarea[0].Look).GetEntityLook(), groupStatic, 0, 255, false, false, false);
                 groupMonsters.Add(new MonsterGroup((int)group.contextualId, this, group));
             }
 

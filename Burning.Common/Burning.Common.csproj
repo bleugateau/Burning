@@ -11,9 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Burning.DofusProtocol">
-      <HintPath>..\Burning.DofusProtocol\bin\Release\Burning.DofusProtocol.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Burning.DofusProtocol\Burning.DofusProtocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="FlatyBot.Common">
       <HintPath>..\..\..\..\Downloads\2.52\FlatyBot.Common.dll</HintPath>
     </Reference>

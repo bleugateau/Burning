@@ -27,7 +27,7 @@ namespace Burning.Emu.World
         private static List<Task> serverTaskList = new List<Task>();
         static void Main(string[] args)
         {
-            Console.Title = "[WORLD] BurningEmu for Dofus 2.52.14 RELEASE";
+            Console.Title = "[WORLD] BurningEmu for Dofus 2.53.2 RELEASE";
 
             FrameManager.Initialize("Burning.Emu.World");
             DatabaseManager.Instance.Initialize("mongodb://localhost");

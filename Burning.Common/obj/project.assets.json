@@ -1463,6 +1463,15 @@
         "runtime": {
           "lib/netstandard1.3/System.Threading.ThreadPool.dll": {}
         }
+      },
+      "Burning.DofusProtocol/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Burning.DofusProtocol.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Burning.DofusProtocol.dll": {}
+        }
       }
     }
   },
@@ -5278,10 +5287,16 @@
         "system.threading.threadpool.4.3.0.nupkg.sha512",
         "system.threading.threadpool.nuspec"
       ]
+    },
+    "Burning.DofusProtocol/1.0.0": {
+      "type": "project",
+      "path": "../Burning.DofusProtocol/Burning.DofusProtocol.csproj",
+      "msbuildProject": "../Burning.DofusProtocol/Burning.DofusProtocol.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
+      "Burning.DofusProtocol >= 1.0.0",
       "Dapper >= 2.0.4",
       "Microsoft.CSharp >= 4.6.0",
       "MongoDB.Driver >= 2.9.1",
@@ -5317,7 +5332,11 @@
       },
       "frameworks": {
         "netstandard2.0": {
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj": {
+              "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

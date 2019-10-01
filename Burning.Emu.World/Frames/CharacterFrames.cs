@@ -279,9 +279,10 @@ namespace Burning.Emu.World.Frames
             client.SendPacket(new ShortcutBarContentMessage((uint)ShortcutBarEnum.GENERAL_SHORTCUT_BAR, new List<Burning.DofusProtocol.Network.Types.Shortcut>()));
             client.SendPacket(new InventoryContentMessage(InventoryRepository.Instance.GetStackedItem(client.ActiveCharacter.Inventory), 0));
             client.SendPacket(new PresetsMessage(new List<Preset>()));
-            client.SendPacket(new RoomAvailableUpdateMessage(1));
             client.SendPacket(new HavenBagPackListMessage(new List<int>() { 1, 2, 3, 4, 5, 6 }));
             client.SendPacket(new EmoteListMessage(new List<uint>() { 1, 19, 22, 97 }));
+
+            client.SendPacket(new HavenBagRoomUpdateMessage(1, new List<HavenBagRoomPreviewInformation>())); //?? 2.53
 
             client.SendPacket(new JobDescriptionMessage(new List<JobDescription>() {
 

@@ -88,7 +88,7 @@ namespace Burning.Emu.World.Game.Fight.Positions
 
                 foreach (var cell in schema.positionsForChallengers)
                 {
-                    uint walkableCell = this.CheckWalkableCell(map, cell, cellWalkableForChallengers);
+                    uint walkableCell = this.GetWalkableCell(map, cell, cellWalkableForChallengers);
 
                     if (walkableCell != 0)
                     {
@@ -101,7 +101,7 @@ namespace Burning.Emu.World.Game.Fight.Positions
                 List<uint> cellWalkableForDefenders = new List<uint>();
                 foreach (var cell in schema.positionsForDefenders)
                 {
-                    uint walkableCell = this.CheckWalkableCell(map, cell, mixedCell);
+                    uint walkableCell = this.GetWalkableCell(map, cell, mixedCell);
                     if (walkableCell != 0 && !mixedCell.Contains(walkableCell))
                     {
                         cellWalkableForDefenders.Add(walkableCell);
@@ -156,7 +156,7 @@ namespace Burning.Emu.World.Game.Fight.Positions
             return finalFightStartingPos;
         }
 
-        private uint CheckWalkableCell(Map.Map map, uint cellId, List<uint> cellDestination)
+        private uint GetWalkableCell(Map.Map map, uint cellId, List<uint> cellDestination)
         {
             var cellWalkable = map.MapData.Cells.ToList().FindAll(x => x.Walkable && x.isObstacle() != true);
             var cellData = map.MapData.Cells.ToList().FirstOrDefault(x => x.Id == cellId);

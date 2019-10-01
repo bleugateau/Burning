@@ -47,6 +47,7 @@
     <Compile Include="Network\ConnectionPasswordMessage.cs" />
     <Compile Include="Network\ConnectionResponceMessage.cs" />
     <Compile Include="Network\MessageReceiver.cs" />
+    <Compile Include="Network\Messages\HavenBagRoomUpdateMessage.cs" />
     <Compile Include="Network\PacketReceivedMessage.cs" />
     <Compile Include="Network\ProtocolTypeManager.cs" />
     <Compile Include="Network\ScriptStartedMessage.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Network\Types\GuildMember.cs" />
     <Compile Include="Network\Types\GuildVersatileInformations.cs" />
     <Compile Include="Network\Types\HavenBagFurnitureInformation.cs" />
+    <Compile Include="Network\Types\HavenBagRoomPreviewInformation.cs" />
     <Compile Include="Network\Types\HouseGuildedInformations.cs" />
     <Compile Include="Network\Types\HouseInformations.cs" />
     <Compile Include="Network\Types\HouseInformationsForGuild.cs" />
@@ -331,6 +333,10 @@
     <Compile Include="Network\Types\SkillActionDescriptionCollect.cs" />
     <Compile Include="Network\Types\SkillActionDescriptionCraft.cs" />
     <Compile Include="Network\Types\SkillActionDescriptionTimed.cs" />
+    <Compile Include="Network\Types\SpawnCharacterInformation.cs" />
+    <Compile Include="Network\Types\SpawnCompanionInformation.cs" />
+    <Compile Include="Network\Types\SpawnInformation.cs" />
+    <Compile Include="Network\Types\SpawnMonsterInformation.cs" />
     <Compile Include="Network\Types\SpellForPreset.cs" />
     <Compile Include="Network\Types\SpellItem.cs" />
     <Compile Include="Network\Types\SpellsPreset.cs" />
@@ -553,7 +559,6 @@
     <Compile Include="Network\Messages\ClientUIOpenedMessage.cs" />
     <Compile Include="Network\Messages\ClientYouAreDrunkMessage.cs" />
     <Compile Include="Network\Messages\CloseHavenBagFurnitureSequenceRequestMessage.cs" />
-    <Compile Include="Network\Messages\ComicReadingBeginMessage.cs" />
     <Compile Include="Network\Messages\CompassResetMessage.cs" />
     <Compile Include="Network\Messages\CompassUpdateMessage.cs" />
     <Compile Include="Network\Messages\CompassUpdatePartyMemberMessage.cs" />
@@ -1303,7 +1308,6 @@
     <Compile Include="Network\Messages\ReloginTokenRequestMessage.cs" />
     <Compile Include="Network\Messages\ReloginTokenStatusMessage.cs" />
     <Compile Include="Network\Messages\ResetCharacterStatsRequestMessage.cs" />
-    <Compile Include="Network\Messages\RoomAvailableUpdateMessage.cs" />
     <Compile Include="Network\Messages\SelectedServerDataExtendedMessage.cs" />
     <Compile Include="Network\Messages\SelectedServerDataMessage.cs" />
     <Compile Include="Network\Messages\SelectedServerRefusedMessage.cs" />

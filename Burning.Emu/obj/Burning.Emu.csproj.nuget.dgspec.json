@@ -29,7 +29,11 @@
         },
         "frameworks": {
           "netstandard2.0": {
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj": {
+                "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -68,6 +72,17 @@
         }
       }
     },
+    "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj",
+        "projectName": "Burning.DofusProtocol",
+        "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj"
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
     "D:\\Developpement\\C#\\Burning2.52\\Burning.Emu\\Burning.Emu.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -96,6 +111,9 @@
             "projectReferences": {
               "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj": {
                 "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj"
+              },
+              "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj": {
+                "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj"
               }
             }
           }

@@ -13,7 +13,7 @@ namespace Burning.Emu
         private static List<Task> serverTaskList = new List<Task>();
         static void Main(string[] args)
         {
-            Console.Title = "[REALM] BurningEmu for Dofus 2.52.14 RELEASE";
+            Console.Title = "[REALM] BurningEmu for Dofus 2.53.2 RELEASE";
 
             FrameManager.Initialize("Burning.Emu");
 

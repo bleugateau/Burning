@@ -1938,6 +1938,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
+          "Burning.DofusProtocol": "1.0.0",
           "Dapper": "2.0.4",
           "Microsoft.CSharp": "4.6.0",
           "MongoDB.Driver": "2.9.1"
@@ -1947,6 +1948,15 @@
         },
         "runtime": {
           "bin/placeholder/Burning.Common.dll": {}
+        }
+      },
+      "Burning.DofusProtocol/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Burning.DofusProtocol.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Burning.DofusProtocol.dll": {}
         }
       }
     }
@@ -6761,11 +6771,17 @@
       "type": "project",
       "path": "../Burning.Common/Burning.Common.csproj",
       "msbuildProject": "../Burning.Common/Burning.Common.csproj"
+    },
+    "Burning.DofusProtocol/1.0.0": {
+      "type": "project",
+      "path": "../Burning.DofusProtocol/Burning.DofusProtocol.csproj",
+      "msbuildProject": "../Burning.DofusProtocol/Burning.DofusProtocol.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
       "Burning.Common >= 1.0.0",
+      "Burning.DofusProtocol >= 1.0.0",
       "Dapper >= 2.0.4",
       "Microsoft.NETCore.App >= 2.1.0",
       "MySql.Data >= 8.0.17"
@@ -6803,6 +6819,9 @@
           "projectReferences": {
             "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj": {
               "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj"
+            },
+            "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj": {
+              "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.DofusProtocol\\Burning.DofusProtocol.csproj"
             }
           }
         }
