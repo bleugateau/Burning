@@ -14,12 +14,12 @@ namespace Burning.D2oSync
         public static D2oReader Reader { get; set; }
         public static IMongoDatabase Database { get; set; }
 
-        public static string BasePath = @"C:\Users\tenfo\Desktop\Dofus 2.52\data\common\";
+        public static string BasePath = @"D:\Program Files (x86)\Ankama\Dofus\Dofus 2.53 patché\data\common\";
 
         static void Main(string[] args)
         {
-            Database = new MongoClient("mongodb://localhost").GetDatabase("burning_datacenter");
-            GetMonsters(BasePath);
+            Database = new MongoClient("mongodb://localhost").GetDatabase("burning_datacenter253");
+            //GetItems(BasePath);
         }
 
         public static void GetNpcs(string basePath)

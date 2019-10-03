@@ -25,8 +25,7 @@ namespace Burning.DofusProtocol.Network.Types
         public GameContextBasicSpawnInformation(
           uint teamId,
           bool alive,
-          GameContextActorPositionInformations informations,
-          uint spawnType)
+          GameContextActorPositionInformations informations)
         {
             this.teamId = teamId;
             this.alive = alive;

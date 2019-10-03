@@ -3,10 +3,13 @@ using Burning.Common.Repository;
 using Burning.Common.Utility.EntityLook;
 using Burning.DofusProtocol.Data.D2P;
 using Burning.DofusProtocol.Network.Types;
+using Burning.Emu.World.Game.Fight;
+using Burning.Emu.World.Game.Fight.Fighters;
 using Burning.Emu.World.Repository;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -92,6 +95,15 @@ namespace Burning.Emu.World.Entity
             }
         }
 
+        [BsonIgnore]
+        public Fight Fight
+        {
+            get
+            {
+                return FightManager.Instance.Fights.Where(x => x.Defenders.Find(d => d is CharacterFighter && d.Id == this.Id) != null || x.Challengers.Find(c => c is CharacterFighter && c.Id == this.Id) != null).Select(f => f).FirstOrDefault();
+            }
+        }
+
 
         public Character()
         {
@@ -135,6 +147,5 @@ namespace Burning.Emu.World.Entity
                 characteristics.meleeDamageDonePercent, characteristics.meleeDamageReceivedPercent, characteristics.rangedDamageDonePercent, characteristics.rangedDamageReceivedPercent, characteristics.weaponDamageDonePercent, characteristics.weaponDamageReceivedPercent, characteristics.spellDamageDonePercent,
                 characteristics.spellDamageReceivedPercent, new List<CharacterSpellModification>(), 0);
         }
-
     }
 }

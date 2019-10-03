@@ -1,5 +1,8 @@
-﻿using Burning.DofusProtocol.Network.Messages;
+﻿using Burning.Common.Repository;
+using Burning.Common.Utility.EntityLook;
+using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
+using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
 using Burning.Emu.World.Game.World;
 using System;
@@ -19,17 +22,43 @@ namespace Burning.Emu.World.Game.Monster
 
         public GameRolePlayGroupMonsterInformations RolePlayGroupMonsterInformations { get; set; }
 
-        private Pathfinder Pathfinder { get; set; }
+        public List<Burning.DofusProtocol.Datacenter.Monster> Monsters { get; set; }
+
         private Timer MovementTimer { get; set; }
 
-        public MonsterGroup(int id, Map.Map map, GameRolePlayGroupMonsterInformations gameRolePlayGroupMonsterInformations)
-        {
-            this.Id = id;
-            this.Map = map;
-            this.Pathfinder = new Pathfinder(new int[] { });
-            this.Pathfinder.SetMap(this.Map.MapData, true);
+        private Random random = new Random();
 
-            this.RolePlayGroupMonsterInformations = gameRolePlayGroupMonsterInformations;
+        public MonsterGroup(Map.Map map)
+        {
+            this.Map = map;
+            this.Id = (random.Next(1, 99999999) * (this.Map.Id / 2));
+
+            this.Monsters = new List<DofusProtocol.Datacenter.Monster>();
+
+            var monsterInSubarea = MonsterRepository.Instance.GetMonstersFromSubarea((uint)this.Map.MapData.SubAreaId);
+
+            int numberOfMonster = random.Next(1, 8 + 1);
+            var groupStatic = new GroupMonsterStaticInformations();
+
+            groupStatic.underlings = new List<MonsterInGroupInformations>();
+
+            for (int m = 0; m < numberOfMonster; m++)
+            {
+                int monsterNum = random.Next(1, monsterInSubarea.Count);
+                if (m == 0)
+                {
+                    groupStatic.mainCreatureLightInfos = new MonsterInGroupLightInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level);
+                }
+                else
+                {
+                    groupStatic.underlings.Add(new MonsterInGroupInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level, Look.Parse(monsterInSubarea[monsterNum].Look).GetEntityLook()));
+                }
+
+                this.Monsters.Add(monsterInSubarea[monsterNum]);
+            }
+
+
+            this.RolePlayGroupMonsterInformations = new GameRolePlayGroupMonsterInformations(this.Id, new EntityDispositionInformations(MapManager.Instance.CheckWalkableCell(this.Map, random.Next(100, 342)), 4), Look.Parse(monsterInSubarea[0].Look).GetEntityLook(), groupStatic, 0, 255, false, false, false);
 
             Console.WriteLine("MONSTER GROUP {0} SPAWNED. ", this.Id);
 
@@ -48,7 +77,7 @@ namespace Burning.Emu.World.Game.Monster
 
         private void MovementTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            var keyMovements = this.Pathfinder.GetPath((short)this.RolePlayGroupMonsterInformations.disposition.cellId, (short)(this.RolePlayGroupMonsterInformations.disposition.cellId + 1)).Select(x => (uint)x.Id).ToList();
+            var keyMovements = this.Map.Pathfinder.GetPath((short)this.RolePlayGroupMonsterInformations.disposition.cellId, (short)(this.RolePlayGroupMonsterInformations.disposition.cellId + 1)).Select(x => (uint)x.Id).ToList();
 
             foreach(var client in WorldManager.Instance.GetClientsOnMapId(this.Map.Id))
             {

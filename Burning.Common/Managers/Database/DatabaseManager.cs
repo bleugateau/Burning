@@ -25,7 +25,7 @@ namespace Burning.Common.Managers.Database
             this.MongoClient = new MongoClient(connectionString);
             this.Realm = this.MongoClient.GetDatabase("burning");
             this.World = this.MongoClient.GetDatabase("burning_world");
-            this.DataCenter = this.MongoClient.GetDatabase("burning_datacenter");
+            this.DataCenter = this.MongoClient.GetDatabase("burning_datacenter253");
 
             BsonClassMap.RegisterClassMap<EffectInstanceDice>();
             BsonClassMap.RegisterClassMap<ObjectEffectInteger>();
