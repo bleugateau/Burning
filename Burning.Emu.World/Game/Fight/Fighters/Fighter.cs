@@ -8,6 +8,10 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public int Id { get; set; }
 
+        public int TimelineOrder { get; set; }
+
+        public int Initiative { get; set; }
+
         public int Life { get; set; }
 
         public int LifeBase { get; set; }

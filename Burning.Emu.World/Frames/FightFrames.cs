@@ -46,7 +46,7 @@ namespace Burning.Emu.World.Frames
 
             //add characters to challengers
             List<Fighter> characters = new List<Fighter>();
-            characters.Add(new CharacterFighter(client.ActiveCharacter.Id, client.ActiveCharacter, (int)map.FightStartingPosition.positionsForChallengers[0])); //ajout du character
+            characters.Add(new CharacterFighter(client.ActiveCharacter, (int)map.FightStartingPosition.positionsForChallengers[0])); //ajout du character
 
             //add fight to fightmanager
             var fight = new Fight(FightTypeEnum.FIGHT_TYPE_PvM, monsters, characters, map.FightStartingPosition);

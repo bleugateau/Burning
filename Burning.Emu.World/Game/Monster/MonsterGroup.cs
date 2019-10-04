@@ -37,6 +37,9 @@ namespace Burning.Emu.World.Game.Monster
 
             var monsterInSubarea = MonsterRepository.Instance.GetMonstersFromSubarea((uint)this.Map.MapData.SubAreaId);
 
+            if (monsterInSubarea.Count == 0)
+                return;
+
             int numberOfMonster = random.Next(1, 8 + 1);
             var groupStatic = new GroupMonsterStaticInformations();
 

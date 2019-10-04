@@ -12,11 +12,17 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public Character Character { get; set; }
 
-        public CharacterFighter(int id, Character character, int cellId)
+        public CharacterFighter(Character character, int cellId)
         {
-            this.Id = id;
+            this.Id = character.Id;
             this.Character = character;
             this.CellId = cellId;
+
+            var characteristic = character.Characteristics;
+
+            this.AP = characteristic.actionPoints.Total;
+            this.PM = characteristic.movementPoints.Total;
+            this.Initiative = characteristic.initiative.Total;
         }
 
         public GameFightCharacterInformations GetGameFightCharacterInformations()

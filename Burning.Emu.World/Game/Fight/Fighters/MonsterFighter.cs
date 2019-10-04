@@ -18,9 +18,12 @@ namespace Burning.Emu.World.Game.Fight.Fighters
             this.Id = cellId * -1;
             this.CellId = cellId;
             this.Monster = monster;
-            this.LifeBase = monster.Grades[0].Vitality;
+
+            this.Life = monster.Grades[0].LifePoints;
+            this.LifeBase = monster.Grades[0].LifePoints;
             this.AP = monster.Grades[0].ActionPoints;
             this.PM = monster.Grades[0].MovementPoints;
+            this.Initiative = (monster.Grades[0].Agility + monster.Grades[0].Chance + monster.Grades[0].Intelligence + monster.Grades[0].Strength + monster.Grades[0].Vitality + monster.Grades[0].Wisdom);
         }
 
         public GameFightMonsterInformations GetGameFightMonsterInformations()

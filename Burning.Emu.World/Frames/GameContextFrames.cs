@@ -84,7 +84,7 @@ namespace Burning.Emu.World.Frames
         public void GameMapMovementRequestMessageFrame(WorldClient client, GameMapMovementRequestMessage gameMapMovementRequestMessage)
         {
             var map = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
-
+            
             Pathfinder pathfinder = new Pathfinder(new int[] { });
             pathfinder.SetMap(map.MapData, true);
 
