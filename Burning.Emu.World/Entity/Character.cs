@@ -2,6 +2,7 @@
 using Burning.Common.Repository;
 using Burning.Common.Utility.EntityLook;
 using Burning.DofusProtocol.Data.D2P;
+using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Game.Fight;
 using Burning.Emu.World.Game.Fight.Fighters;
@@ -104,6 +105,24 @@ namespace Burning.Emu.World.Entity
             }
         }
 
+        [BsonIgnore]
+        public Breed BreedData
+        {
+            get
+            {
+                return BreedRepository.Instance.GetBreedById(this.Breed);
+            }
+        }
+
+        [BsonIgnore]
+        public List<CharacterShortcut> CharacterShortcutBars
+        {
+            get
+            {
+                return CharacterShortcutRepository.Instance.GetShortcutByCharacterId(this.Id);
+            }
+        }
+
 
         public Character()
         {
@@ -146,6 +165,50 @@ namespace Burning.Emu.World.Entity
                 characteristics.pvpAirElementResistPercent, characteristics.pvpFireElementResistPercent, characteristics.pvpNeutralElementReduction, characteristics.pvpEarthElementReduction, characteristics.pvpWaterElementReduction, characteristics.pvpAirElementReduction, characteristics.pvpFireElementReduction,
                 characteristics.meleeDamageDonePercent, characteristics.meleeDamageReceivedPercent, characteristics.rangedDamageDonePercent, characteristics.rangedDamageReceivedPercent, characteristics.weaponDamageDonePercent, characteristics.weaponDamageReceivedPercent, characteristics.spellDamageDonePercent,
                 characteristics.spellDamageReceivedPercent, new List<CharacterSpellModification>(), 0);
+        }
+
+        public List<Spell> GetSpells()
+        {
+            List<Spell> spells = new List<Spell>();
+            var breed = this.BreedData;
+
+            if(breed != null)
+            {
+                foreach(var spellId in breed.BreedSpellsId)
+                {
+                    var spell = SpellRepository.Instance.GetSpellById((int)spellId);
+                    if (spell != null)
+                        spells.Add(spell);
+                }
+            }
+
+            return spells;
+        }
+
+        public List<SpellItem> GetAvaibleSpells()
+        {
+            List<SpellItem> avaibleSpells = new List<SpellItem>();
+            var spells = this.GetSpells();
+
+            if (spells != null)
+            {
+                foreach (var spell in spells)
+                {
+                    int level = 0;
+                    foreach(var spellLevel in spell.SpellLevels)
+                    {
+                        var spellLevelData = SpellLevelRepository.Instance.GetSpellLevelById((int)spellLevel);
+
+                        if (spellLevelData != null && spellLevelData.MinPlayerLevel <= this.Level)
+                            level += 1;
+                    }
+
+                    if(level != 0)
+                        avaibleSpells.Add(new SpellItem(spell.Id, level));
+                }
+            }
+            
+            return avaibleSpells;
         }
     }
 }

@@ -20,6 +20,7 @@ using Burning.Emu.World.Game.PathFinder;
 using System.Threading.Tasks;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Repository;
+using Burning.Emu.World.Game.Fight.Fighters;
 
 namespace Burning.Emu.World.Frames
 {
@@ -95,13 +96,24 @@ namespace Burning.Emu.World.Frames
                 return;
             }
 
-            foreach (var otherClients in WorldManager.Instance.GetNearestClientsFromCharacter(client.ActiveCharacter))
-            {
-                otherClients.SendPacket(new GameMapMovementMessage(gameMapMovementRequestMessage.keyMovements, 2, client.ActiveCharacter.Id));
-            }
+            var fight = client.ActiveCharacter.Fight;
 
-            client.ActiveCharacter.CellId = cellId;
-            CharacterRepository.Instance.Update(client.ActiveCharacter);
+            if (fight != null) //si le joueur est dans un fight
+            {
+                if(fight.ActualFighter is CharacterFighter && fight.ActualFighter.Id == client.ActiveCharacter.Id)
+                    fight.MovementRequestSequence(cellId);
+            }
+            else
+            {
+                foreach (var otherClients in WorldManager.Instance.GetNearestClientsFromCharacter(client.ActiveCharacter))
+                {
+                    otherClients.SendPacket(new GameMapMovementMessage(gameMapMovementRequestMessage.keyMovements, 2, client.ActiveCharacter.Id));
+                }
+
+                client.ActiveCharacter.CellId = cellId;
+                CharacterRepository.Instance.Update(client.ActiveCharacter);
+            }
+            
         }
 
         [PacketId(ChangeMapMessage.Id)]

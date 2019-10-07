@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Burning.D2oSync
@@ -19,7 +20,7 @@ namespace Burning.D2oSync
         static void Main(string[] args)
         {
             Database = new MongoClient("mongodb://localhost").GetDatabase("burning_datacenter253");
-            //GetItems(BasePath);
+            //GetBreeds(BasePath);
         }
 
         public static void GetNpcs(string basePath)
@@ -47,6 +48,31 @@ namespace Burning.D2oSync
 
         }
 
+        public static void GetBreeds(string basePath)
+        {
+            Reader = new D2oReader(basePath + "Breeds.d2o");
+
+            var collection = Database.GetCollection<Breed>("breeds");
+            if (collection == null)
+            {
+                Database.CreateCollection("breeds");
+                collection = Database.GetCollection<Breed>("breeds");
+            }
+
+            int counter = 0;
+            foreach (var item in Reader.ReadObjects())
+            {
+                counter++;
+                collection.InsertOne((Breed)item.Value);
+                Console.WriteLine("breed {0}/{1} added.", counter, Reader.IndexCount);
+            }
+
+            Console.WriteLine("Collection generated :)");
+
+            Console.ReadKey();
+
+        }
+
         public static void GetSpells(string basePath)
         {
             Reader = new D2oReader(basePath + "Spells.d2o");
@@ -64,6 +90,63 @@ namespace Burning.D2oSync
                 counter++;
                 collection.InsertOne((Spell)item.Value);
                 Console.WriteLine("spells {0}/{1} added.", counter, Reader.IndexCount);
+            }
+
+            Console.WriteLine("Collection generated :)");
+
+            Console.ReadKey();
+        }
+
+        public static void GetSpellsLevels(string basePath)
+        {
+            Reader = new D2oReader(basePath + "SpellLevels.d2o");
+
+            var collection = Database.GetCollection<SpellLevel>("spells_levels");
+            if (collection == null)
+            {
+                Database.CreateCollection("spells_levels");
+                collection = Database.GetCollection<SpellLevel>("spells_levels");
+            }
+
+            int counter = 0;
+            foreach (var item in Reader.ReadObjects())
+            {
+                try
+                {
+                    collection.InsertOne((SpellLevel)item.Value);
+                    counter++;
+                    Console.WriteLine("spells levels {0}/{1} added.", counter, Reader.IndexCount);
+                }
+                catch
+                {
+                    Console.WriteLine("error try again");
+                }
+            }
+
+            Console.WriteLine("Collection generated :)");
+
+            Console.ReadKey();
+
+
+        }
+
+        public static void GetSpellsVariants(string basePath)
+        {
+            Reader = new D2oReader(basePath + "SpellVariants.d2o");
+
+            var collection = Database.GetCollection<SpellVariant>("spells_variants");
+            if (collection == null)
+            {
+                Database.CreateCollection("spells_variants");
+                collection = Database.GetCollection<SpellVariant>("spells_variants");
+            }
+
+            int counter = 0;
+            foreach (var item in Reader.ReadObjects())
+            {
+                counter++;
+                collection.InsertOne((SpellVariant)item.Value);
+                Console.WriteLine("spells variants {0}/{1} added.", counter, Reader.IndexCount);
             }
 
             Console.WriteLine("Collection generated :)");

@@ -139,7 +139,7 @@ namespace Burning.Emu.World.Repository
                 return false;
             }
 
-            var breed = BreedRepository.Instance.List.Find(x => x.Id == character.Breed);
+            var breed = BreedRepository.Instance.GetBreedById((int)character.Breed);
             var characteristic = character.Characteristics;
 
             switch ((BoostableCharacteristicEnum)statId)

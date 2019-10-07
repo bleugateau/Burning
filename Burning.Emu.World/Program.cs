@@ -38,7 +38,7 @@ namespace Burning.Emu.World
             InventoryRepository.Instance.Initialize("inventory");
 
             BreedRepository.Instance.Initialize("breeds");
-            Console.WriteLine("{0} breed(s) loaded from d2o.", BreedRepository.Instance.List.Count);
+            SpellRepository.Instance.Initialize("spells");
 
             HeadRepository.Instance.Initialize("heads");
             Console.WriteLine("{0} head(s) loaded from d2o.", HeadRepository.Instance.List.Count);

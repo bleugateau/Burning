@@ -16,6 +16,8 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public int LifeBase { get; set; }
 
+        public int ShieldPoints { get; set; }
+
         public int AP { get; set; }
 
         public int PM { get; set; }

@@ -4,6 +4,7 @@ using Burning.DofusProtocol.Network.Types;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -29,6 +30,10 @@ namespace Burning.Common.Managers.Database
 
             BsonClassMap.RegisterClassMap<EffectInstanceDice>();
             BsonClassMap.RegisterClassMap<ObjectEffectInteger>();
+            BsonClassMap.RegisterClassMap<ShortcutSpell>();
+            BsonClassMap.RegisterClassMap<ShortcutObjectItem>();
+            BsonClassMap.RegisterClassMap<ShortcutObjectIdolsPreset>();
+            BsonClassMap.RegisterClassMap<ShortcutObjectPreset>();
         }
 
         public int AutoIncrement<T>(IMongoCollection<T> collection)

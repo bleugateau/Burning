@@ -2,35 +2,38 @@
 using Burning.Common.Managers.Singleton;
 using Burning.DofusProtocol.Data.D2o;
 using Burning.DofusProtocol.Datacenter;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Burning.Common.Repository
 {
-    public class BreedRepository : SingletonManager<BreedRepository>, InterfaceTest<Breed>
+    public class BreedRepository : SingletonManager<BreedRepository>, IRepository<Breed>
     {
-        private static string tableName = "breeds";
-        public static string Table { get { return tableName; } }
+        public IMongoCollection<Breed> Collection { get; set; }
 
-        //public RepositoryAccessor Accessor { get; set; }
-        public string TableName { get; set; }
-        public List<Burning.DofusProtocol.Datacenter.Breed> List { get; set; }
+        private List<Breed> Breeds { get; set; }
 
-        public void Initialize(string tableName)
+        public void Initialize(string dataName)
         {
-            this.TableName = tableName;
-            //this.Accessor = new RepositoryAccessor(this.TableName);
-            //this.List = this.Accessor.Fill<Breed>();
+            this.Collection = DatabaseManager.Instance.DataCenter.GetCollection<Breed>(dataName);
+            this.Breeds = this.Collection.Find(_ => true).ToList();
+        }
 
-            this.List = new List<Burning.DofusProtocol.Datacenter.Breed>();
+        public Breed GetBreedById(int breedId)
+        {
+            return this.Breeds.Find(x => x.Id == breedId);
+        }
 
-            D2oReader reader = new D2oReader("common/"+this.TableName+".d2o");
-            for (int i = 1; i < reader.IndexCount + 1; i++)
-            {
-                this.List.Add((Burning.DofusProtocol.Datacenter.Breed)reader.ReadObject(i));
-            }
-            reader.Close();
+        public void Insert(Breed entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Breed entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

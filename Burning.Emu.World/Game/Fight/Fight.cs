@@ -8,14 +8,19 @@ using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.Emu.World.Game.Map;
+using Burning.Emu.World.Game.PathFinder;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Network;
+using FlatyBot.Common.Network;
 
 namespace Burning.Emu.World.Game.Fight
 {
     public class Fight
     {
         public int Id { get; set; }
+
+        public int MapId { get; set; }
 
         public Fighter ActualFighter { get; set; }
 
@@ -37,9 +42,10 @@ namespace Burning.Emu.World.Game.Fight
 
         private Timer PlacementPhaseTimer { get; set; }
 
-        public Fight(FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
+        public Fight(int mapId, FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
         {
             this.Id = 1; //Uniqid a faire
+            this.MapId = mapId;
             this.FightType = type;
             this.Defenders = defenders;
             this.Challengers = challengers;
@@ -112,12 +118,111 @@ namespace Burning.Emu.World.Game.Fight
             return true;
         }
 
+        private void SendToAllFighters(List<NetworkMessage> messages)
+        {
+            foreach (var fighter in this.Challengers.Concat(this.Defenders).ToList().FindAll(x => x is CharacterFighter))
+            {
+                var client = WorldManager.Instance.GetClientFromCharacter(((CharacterFighter)fighter).Character);
+                if (client != null)
+                {
+                    foreach (var msg in messages)
+                    {
+                        client.SendPacket(msg);
+                    }
+                }
+            }
+
+        }
+
+        public void TurnEnd()
+        {
+            //queue message
+            List<NetworkMessage> messages = new List<NetworkMessage>();
+            messages.Add(new GameFightTurnEndMessage((double)this.ActualFighter.Id)); //fin du tour
+            messages.Add(new GameFightTurnReadyRequestMessage((double)this.ActualFighter.Id));
+
+
+            //reset AP/PM
+            if (this.ActualFighter is CharacterFighter)
+                ((CharacterFighter)this.ActualFighter).ResetFighter();
+
+            TurnTimer.Stop();
+
+            var aliveFighters = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().FindAll(x => x.Life > 0);
+            var nextFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().Find(x => x.TimelineOrder > this.ActualFighter.TimelineOrder && x.Life > 0);
+
+            if (nextFighter == null)
+            {
+                if (aliveFighters.Count > 1)
+                {
+                    this.ActualFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().First();
+                    this.Round += 1;
+                    messages.Add(new GameFightNewRoundMessage((uint)this.Round));
+                }
+                else
+                {
+                    Console.WriteLine("Fin du combat !");
+                    return;
+                }
+            }
+            else
+            {
+                this.ActualFighter = nextFighter;
+            }
+
+
+            Console.WriteLine("FIN DU TOUR DE JEU");
+            Console.WriteLine("NOUVEAU TOUR POUR {0} authorId.", this.ActualFighter.Id);
+
+            int nextTurnSecondes = 320;
+            if (this.ActualFighter is MonsterFighter)
+                nextTurnSecondes = 50;
+
+            //calcul temps additionnel = time restant / 2 entier le plus bas
+
+            messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, (uint)nextTurnSecondes)); //nouveau tour
+
+            this.SendToAllFighters(messages);
+
+            this.StartTurnTimer(nextTurnSecondes);
+        }
+
+        public void MovementRequestSequence(int requestedCellId)
+        {
+            var usedCells = this.Defenders.Concat(this.Challengers).Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
+            var map = MapManager.Instance.GetMap(this.MapId);
+
+            var path = new Pathfinder(usedCells);
+            path.SetMap(map.MapData, false);
+
+            var cells = path.GetPath((short)this.ActualFighter.CellId, (short)requestedCellId).Select(x => (uint)x.Id).ToList();
+
+            if (cells.Count <= 1)
+                return;
+
+            var cellDistance = (cells.Count - 1); // taille du déplacement - la cell de départ
+
+            if (cellDistance > this.ActualFighter.PM)
+                return;
+
+            this.ActualFighter.CellId = MapManager.Instance.GetCellIdFromKeyMovement((int)cells[cells.Count - 1]);
+            this.ActualFighter.PM -= cellDistance; //- distance
+
+            List<NetworkMessage> queueMessages = new List<NetworkMessage>();
+            queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_MOVE, this.ActualFighter.Id));
+            queueMessages.Add(new GameMapMovementMessage(cells, 3, this.ActualFighter.Id));
+            queueMessages.Add(new GameActionFightPointsVariationMessage(129, this.ActualFighter.Id, this.ActualFighter.Id, -(cellDistance)));
+            queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_MOVE));
+
+            this.SendToAllFighters(queueMessages);
+        }
+
         public void StartPlacementPhaseTimer()
         {
             if (this.FightState != FightStateEnum.FIGHT_CHOICE_PLACEMENT)
                 return;
 
-            PlacementPhaseTimer = new Timer(45000);
+            PlacementPhaseTimer = new Timer(5000);
             PlacementPhaseTimer.Elapsed += Timer_Elapsed;
             PlacementPhaseTimer.Enabled = true;
         }
@@ -137,54 +242,35 @@ namespace Burning.Emu.World.Game.Fight
             switch(this.FightState)
             {
                 case FightStateEnum.FIGHT_CHOICE_PLACEMENT:
+                    PlacementPhaseTimer.Stop();
+
                     //actualise l'ordre dans la timeline
-                    var orderedFighters = this.Challengers.Concat(this.Defenders).OrderBy(x => x.Initiative).ToList();
+                    var orderedFighters = this.Challengers.Concat(this.Defenders).OrderByDescending(x => x.Initiative).ToList();
                     for(int i = 0; i < orderedFighters.Count; i++)
                     {
                         orderedFighters[i].TimelineOrder = (i + 1);
                     }
 
-                    foreach (var fighter in this.Challengers.Concat(this.Defenders).ToList().FindAll(x => x is CharacterFighter))
-                    {
-                        var client = WorldManager.Instance.GetClientFromCharacter(((CharacterFighter)fighter).Character);
-                        if (client != null)
-                            client.SendPacket(new GameFightTurnStartMessage(orderedFighters[0].Id, 320));
-                    }
 
+                    List<NetworkMessage> messages = new List<NetworkMessage>();
+                    messages.Add(new GameFightStartMessage(new List<Idol>()));
+                    messages.Add(new GameFightTurnListMessage(orderedFighters.Select(x => (double)x.Id).ToList(), new List<double> { }));
+                    
                     this.ActualFighter = orderedFighters[0];
                     this.Round = 1;
                     this.FightState = FightStateEnum.FIGHT_STARTED;
+
+
+                    messages.Add(new GameFightNewRoundMessage((uint)this.Round));
+                    messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, 320));
+
+                    this.SendToAllFighters(messages);
+
                     this.StartTurnTimer(50);
-                    PlacementPhaseTimer.Stop();
                     break;
                 case FightStateEnum.FIGHT_STARTED:
                     //todo faire une fonction qui turnEnd
-                    TurnTimer.Stop();
-
-                    var aliveFighters = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().FindAll(x => x.Life > 0);
-                    var nextFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().Find(x => x.TimelineOrder > this.ActualFighter.TimelineOrder && x.Life > 0);
-
-                    if (nextFighter == null)
-                    {
-                        if (aliveFighters.Count > 1)
-                        {
-                            this.ActualFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().First();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Fin du combat !");
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        this.ActualFighter = nextFighter;
-                    }
-
-                    Console.WriteLine("FIN DU TOUR DE JEU");
-                    Console.WriteLine("NOUVEAU TOUR POUR {0} authorId.", this.ActualFighter.Id);
-
-                    this.StartTurnTimer(50);
+                    this.TurnEnd();
                     break;
             }
         }

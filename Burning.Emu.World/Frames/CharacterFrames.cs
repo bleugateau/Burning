@@ -55,6 +55,13 @@ namespace Burning.Emu.World.Frames
 
             DatabaseManager.Instance.Delete<CharacterCharacteristic>(CharacterCharacteristicRepository.Instance.Collection, character.Characteristics);
             DatabaseManager.Instance.Delete<Inventory>(InventoryRepository.Instance.Collection, character.Inventory);
+
+            //delete shortcuts
+            foreach(var shortcutBar in character.CharacterShortcutBars)
+            {
+                DatabaseManager.Instance.Delete<CharacterShortcut>(CharacterShortcutRepository.Instance.Collection, shortcutBar);
+            }
+
             DatabaseManager.Instance.Delete<Character>(CharacterRepository.Instance.Collection, character);
 
             this.SendCharacterListMessage(client);
@@ -75,7 +82,7 @@ namespace Burning.Emu.World.Frames
         [PacketId(CharacterCreationRequestMessage.Id)]
         public void CharacterCreationRequestMessageFrame(WorldClient client, CharacterCreationRequestMessage characterCreationRequestMessage)
         {
-            Burning.DofusProtocol.Datacenter.Breed breed = BreedRepository.Instance.List.Find(x => x.Id == characterCreationRequestMessage.breed);
+            Burning.DofusProtocol.Datacenter.Breed breed = BreedRepository.Instance.GetBreedById(characterCreationRequestMessage.breed);
             var look = Look.Parse(characterCreationRequestMessage.sex ? breed.FemaleLook : breed.MaleLook);
 
             for(int i = 1; i < characterCreationRequestMessage.colors.Length; i++)
@@ -275,8 +282,16 @@ namespace Burning.Emu.World.Frames
         {
             client.SendPacket(new NotificationListMessage(new List<int>() { }));
             client.SendPacket(new CharacterSelectedSuccessMessage(new Burning.DofusProtocol.Network.Types.CharacterBaseInformations(client.ActiveCharacter.Id, client.ActiveCharacter.Name, (uint)client.ActiveCharacter.Level, client.ActiveCharacter.Look, client.ActiveCharacter.Breed, client.ActiveCharacter.Sex), false));
-            client.SendPacket(new SpellListMessage(true, new List<Burning.DofusProtocol.Network.Types.SpellItem>()));
-            client.SendPacket(new ShortcutBarContentMessage((uint)ShortcutBarEnum.GENERAL_SHORTCUT_BAR, new List<Burning.DofusProtocol.Network.Types.Shortcut>()));
+
+
+            client.SendPacket(new SpellListMessage(true, client.ActiveCharacter.GetAvaibleSpells()));
+            
+            foreach(var shortcutBar in client.ActiveCharacter.CharacterShortcutBars)
+            {
+                client.SendPacket(new ShortcutBarContentMessage((uint)shortcutBar.BarType, shortcutBar.ShortcutObjects));
+            }
+
+
             client.SendPacket(new InventoryContentMessage(InventoryRepository.Instance.GetStackedItem(client.ActiveCharacter.Inventory), 0));
             client.SendPacket(new PresetsMessage(new List<Preset>()));
             client.SendPacket(new HavenBagPackListMessage(new List<int>() { 1, 2, 3, 4, 5, 6 }));

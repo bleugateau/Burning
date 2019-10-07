@@ -24,11 +24,34 @@ namespace Burning.Emu.World.Repository
             CharacterCharacteristicRepository.Instance.Initialize("character_characteristics");
             CharacterOrnamentRepository.Instance.Initialize("character_ornaments");
             CharacterTitleRepository.Instance.Initialize("character_titles");
+            CharacterShortcutRepository.Instance.Initialize("character_shortcuts");
         }
 
         public void Insert(Character entity)
         {
             this.Collection.InsertOne(entity);
+
+            //add shortcut general
+            CharacterShortcut characterShortcutGeneral = new CharacterShortcut
+            {
+                Id = DatabaseManager.Instance.AutoIncrement<CharacterShortcut>(CharacterShortcutRepository.Instance.Collection),
+                CharacterId = entity.Id,
+                BarType = DofusProtocol.Enums.ShortcutBarEnum.GENERAL_SHORTCUT_BAR,
+                ShortcutObjects = new List<DofusProtocol.Network.Types.Shortcut>()
+            };
+
+            CharacterShortcutRepository.Instance.Insert(characterShortcutGeneral);
+
+            //add shortcut spell
+            CharacterShortcut characterShortcutSpell = new CharacterShortcut
+            {
+                Id = DatabaseManager.Instance.AutoIncrement<CharacterShortcut>(CharacterShortcutRepository.Instance.Collection),
+                CharacterId = entity.Id,
+                BarType = DofusProtocol.Enums.ShortcutBarEnum.SPELL_SHORTCUT_BAR,
+                ShortcutObjects = new List<DofusProtocol.Network.Types.Shortcut>()
+            };
+
+            CharacterShortcutRepository.Instance.Insert(characterShortcutSpell);
         }
 
         public void Update(Character entity)

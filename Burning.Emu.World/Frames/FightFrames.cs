@@ -49,7 +49,7 @@ namespace Burning.Emu.World.Frames
             characters.Add(new CharacterFighter(client.ActiveCharacter, (int)map.FightStartingPosition.positionsForChallengers[0])); //ajout du character
 
             //add fight to fightmanager
-            var fight = new Fight(FightTypeEnum.FIGHT_TYPE_PvM, monsters, characters, map.FightStartingPosition);
+            var fight = new Fight(client.ActiveCharacter.MapId, FightTypeEnum.FIGHT_TYPE_PvM, monsters, characters, map.FightStartingPosition);
             FightManager.Instance.Fights.Add(fight);
             fight.EnterFight(client); //enter into fight
         }
@@ -64,6 +64,18 @@ namespace Burning.Emu.World.Frames
 
             if (!fight.CanChangeStartingPositions(client, (int)gameFightPlacementPositionRequestMessage.cellId))
                 return;
+        }
+
+        [PacketId(GameFightTurnFinishMessage.Id)]
+        public void GameFightTurnFinishMessageFrame(WorldClient client, GameFightTurnFinishMessage gameFightTurnFinishMessage)
+        {
+            var fight = client.ActiveCharacter.Fight;
+
+            if (fight == null)
+                return;
+
+            if (fight.ActualFighter is CharacterFighter && fight.ActualFighter.Id == client.ActiveCharacter.Id)
+                fight.TurnEnd();
         }
     }
 }
