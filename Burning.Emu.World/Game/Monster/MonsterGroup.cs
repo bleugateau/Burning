@@ -47,7 +47,7 @@ namespace Burning.Emu.World.Game.Monster
 
             for (int m = 0; m < numberOfMonster; m++)
             {
-                int monsterNum = random.Next(1, monsterInSubarea.Count);
+                int monsterNum = random.Next(0, monsterInSubarea.Count - 1);
                 if (m == 0)
                 {
                     groupStatic.mainCreatureLightInfos = new MonsterInGroupLightInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level);

@@ -12,6 +12,8 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public Character Character { get; set; }
 
+        public CharacterFighter() { }
+
         public CharacterFighter(Character character, int cellId)
         {
             this.Id = character.Id;

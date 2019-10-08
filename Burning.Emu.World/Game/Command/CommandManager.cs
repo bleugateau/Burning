@@ -10,13 +10,12 @@ using System.Text;
 
 namespace Burning.Emu.World.Game.Command
 {
-    public class CommandManager : SingletonManager<CommandManager>
+    public static class CommandManager
     {
-        private Dictionary<string, CommandData> CommandsList = new Dictionary<string, CommandData>();
+        private static Dictionary<string, CommandData> CommandsList = new Dictionary<string, CommandData>();
 
-        public CommandManager() { }
 
-        public void Initialize()
+        public static void Initialize()
         {
             Assembly assembly = typeof(Command).Assembly;
             foreach (var type in assembly.GetTypes().SelectMany(x => x.GetConstructors()).Where(m => m.GetCustomAttributes(typeof(CommandAttribute), false).Length > 0).ToArray())
@@ -37,16 +36,16 @@ namespace Burning.Emu.World.Game.Command
                 ConstructorInfo ctor = stringType.GetConstructor(paramTypes.ToArray());
                 object instance = ctor.Invoke(objectParam.ToArray());
 
-                this.CommandsList.Add(attr.CommandeName, new CommandData(instance, attr.CommandeName, type));
+                CommandsList.Add(attr.CommandeName, new CommandData(instance, attr.CommandeName, type));
             }
 
-            Console.WriteLine("{0} command(s) initialized.", this.CommandsList.Count);
+            Console.WriteLine("{0} command(s) initialized.", CommandsList.Count);
         }
 
-        public void GetCommandeFromContent(string content, WorldClient client)
+        public static void GetCommandeFromContent(string content, WorldClient client)
         {
 
-            var command = this.CommandsList.FirstOrDefault(x => content.Contains(x.Key));
+            var command = CommandsList.FirstOrDefault(x => content.Contains(x.Key));
             if(command.Key != null && content.StartsWith("."))
             {
                 command.Value.Methode.Invoke(command.Value.Instance, new object[] { content, client });

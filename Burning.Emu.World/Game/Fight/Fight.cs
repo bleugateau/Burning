@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using Burning.Common.Repository;
 using Burning.DofusProtocol.Enums;
 using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
+using Burning.Emu.World.Game.Fight.Effects;
 using Burning.Emu.World.Game.Fight.Fighters;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
@@ -215,6 +217,53 @@ namespace Burning.Emu.World.Game.Fight
             queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_MOVE));
 
             this.SendToAllFighters(queueMessages);
+        }
+
+        public void CastSpellRequestSequence(int cellId, int spellId)
+        {
+            if(this.ActualFighter is CharacterFighter)
+            {
+                var characterFighter = (CharacterFighter)this.ActualFighter;
+
+                var spellItem = characterFighter.Character.GetAvaibleSpells().Find(x => x.spellId == spellId);
+                if (spellItem == null)
+                    return;
+
+
+                var spellTemplate = SpellRepository.Instance.GetSpellById(spellId);
+                var spellLevel = SpellLevelRepository.Instance.GetSpellLevelById((int)spellTemplate.SpellLevels[spellItem.spellLevel - 1]);
+
+                //si pas assez de Point actions
+                if (spellLevel.ApCost > this.ActualFighter.AP)
+                    return;
+
+                var target = this.Challengers.Concat(this.Defenders).FirstOrDefault(x => x.CellId == cellId);
+                if (target == null)
+                    return;
+
+                List<NetworkMessage> queueMessages = new List<NetworkMessage>();
+                queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_SPELL, this.ActualFighter.Id));
+                queueMessages.Add(new GameActionFightSpellCastMessage(300, this.ActualFighter.Id, target.Id, cellId, 0, false, true, (uint)spellId, spellItem.spellLevel, new List<int>()));
+
+                queueMessages.Add(new GameActionFightPointsVariationMessage(102, this.ActualFighter.Id, this.ActualFighter.Id, -((int)spellLevel.ApCost)));
+
+                //on enleve les PA
+                this.ActualFighter.AP -= (int)spellLevel.ApCost;
+
+                Console.WriteLine("LIFE BEFORE EFFECTMANAGER {0}pdv", target.Life);
+
+                //manager for effects from spell
+                SpellEffectManager.BuildEffect(this.ActualFighter, target, spellLevel, queueMessages);
+
+
+                Console.WriteLine("LIFE AFTER EFFECTMANAGER {0}pdv", target.Life);
+
+                //queueMessages.Add(new GameActionFightLifePointsLostMessage(300, this.ActualFighter.Id, target.Id, 1, 1, 1)); //si enemi perd pdv
+                queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_SPELL));
+
+                this.SendToAllFighters(queueMessages);
+
+            }
         }
 
         public void StartPlacementPhaseTimer()

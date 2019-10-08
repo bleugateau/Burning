@@ -20,6 +20,7 @@ using Burning.Emu.World.Game.Guild;
 using Burning.Emu.World.Repository;
 using Burning.Emu.World.Game.Fight.Positions;
 using Burning.Emu.World.Game.Fight;
+using Burning.Emu.World.Game.Fight.Effects;
 
 namespace Burning.Emu.World
 {
@@ -51,14 +52,15 @@ namespace Burning.Emu.World
 
             MapTransitionsRepository.Instance.Initialize("maps_transitions");
 
+            //Manager
+            SpellEffectManager.Initialize();
+            CommandManager.Initialize();
+            GuildManager.Instance.Initialize();
+            FightManager.Instance.Initialize();
 
             WorldServer worldServer = new WorldServer("127.0.0.1", 6666);
             serverTaskList.Add(Task.Run(() => worldServer.Start()));
 
-            //Manager
-            CommandManager.Instance.Initialize();
-            GuildManager.Instance.Initialize();
-            FightManager.Instance.Initialize();
 
             Task.WaitAll(serverTaskList.ToArray());
         }

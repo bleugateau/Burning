@@ -29,6 +29,9 @@ namespace Burning.Emu.World.Frames
             if (monstergroup == null)
                 return;
 
+            if (client.ActiveCharacter.CellId != monstergroup.RolePlayGroupMonsterInformations.disposition.cellId)
+                return;
+                
 
             client.SendPacket(new GameContextDestroyMessage());
             client.SendPacket(new GameContextCreateMessage(2));
@@ -83,9 +86,18 @@ namespace Burning.Emu.World.Frames
 
             if (fight.ActualFighter is CharacterFighter && fight.ActualFighter.Id == client.ActiveCharacter.Id)
                 fight.TurnEnd();
+        }
 
+        [PacketId(GameActionFightCastRequestMessage.Id)]
+        public void GameActionFightCastRequestMessageFrame(WorldClient client, GameActionFightCastRequestMessage gameActionFightCastRequestMessage)
+        {
+            var fight = client.ActiveCharacter.Fight;
 
-            Console.WriteLine("Turn end ok");
+            if (fight == null)
+                return;
+
+            if (fight.ActualFighter is CharacterFighter && fight.ActualFighter.Id == client.ActiveCharacter.Id)
+                fight.CastSpellRequestSequence(gameActionFightCastRequestMessage.cellId, (int)gameActionFightCastRequestMessage.spellId);
         }
     }
 }
