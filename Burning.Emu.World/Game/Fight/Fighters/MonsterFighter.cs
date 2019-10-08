@@ -28,10 +28,15 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public GameFightMonsterInformations GetGameFightMonsterInformations()
         {
-            GameContextActorPositionInformations positionInformations = new GameContextActorPositionInformations(this.Id, new EntityDispositionInformations(this.CellId, 1));
-            GameFightMinimalStats gameFightMinimalStats = new GameFightMinimalStats();
+            GameContextActorPositionInformations positionInformations = new GameContextActorPositionInformations((double)this.Id, new EntityDispositionInformations(this.CellId, 1));
 
-            return new GameFightMonsterInformations(this.Id, new EntityDispositionInformations(this.CellId, 1), Look.Parse(this.Monster.Look).GetEntityLook(), new GameContextBasicSpawnInformation(1, true, positionInformations), 0, gameFightMinimalStats, new List<uint>(), (uint)this.Monster.Id, this.Monster.Grades[0].Grade, this.Monster.Grades[0].Level);
+            var characteristics = this.Monster.Grades[0];
+
+            GameFightMinimalStatsPreparation gameFightMinimalStats = new GameFightMinimalStatsPreparation((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, 0, (uint)this.ShieldPoints, characteristics.ActionPoints, characteristics.ActionPoints, characteristics.MovementPoints, characteristics.MovementPoints, 0, false,
+                characteristics.NeutralResistance, characteristics.EarthResistance, characteristics.WaterResistance, characteristics.AirResistance, characteristics.FireResistance, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (uint)this.Initiative);
+
+            return new GameFightMonsterInformations((double)this.Id, new EntityDispositionInformations(this.CellId, 1), Look.Parse(this.Monster.Look).GetEntityLook(), new GameContextBasicSpawnInformation(1, true, positionInformations), 0, gameFightMinimalStats, new List<uint>(), (uint)this.Monster.Id, this.Monster.Grades[0].Grade, this.Monster.Grades[0].Level);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Burning.Emu.World.Network
         {
             Console.WriteLine("Switched to world server.");
 
-            this.SendPacket(new ProtocolRequired(1937, 1937));
+            this.SendPacket(new ProtocolRequired(1945, 1945));
             this.SendPacket(new HelloGameMessage());
         }
 
@@ -36,7 +36,6 @@ namespace Burning.Emu.World.Network
                     otherClient.SendPacket(new GameContextRemoveElementMessage(this.ActiveCharacter.Id));
                 }
             }
-            
 
             WorldManager.Instance.worldClients.Remove(this);
         }

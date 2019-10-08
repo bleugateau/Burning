@@ -18,29 +18,36 @@ namespace Burning.Emu.World.Frames
         [PacketId(GameRolePlayAttackMonsterRequestMessage.Id)]
         public void GameRolePlayAttackMonsterRequestMessageFrame(WorldClient client, GameRolePlayAttackMonsterRequestMessage gameRolePlayAttackMonsterRequestMessage)
         {
-            client.SendPacket(new GameContextDestroyMessage());
-            client.SendPacket(new GameContextCreateMessage(2));
-            client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
-            client.SendPacket(new GameFightStartingMessage((uint)FightTypeEnum.FIGHT_TYPE_PvM, 1, gameRolePlayAttackMonsterRequestMessage.monsterGroupId, (double)client.ActiveCharacter.Id));
 
             var map = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
+
+            if (map == null)
+                return;
+
             var monstergroup = map.MonstersGroups.Find(x => x.Id == (int)gameRolePlayAttackMonsterRequestMessage.monsterGroupId);
 
             if (monstergroup == null)
                 return;
+
+
+            client.SendPacket(new GameContextDestroyMessage());
+            client.SendPacket(new GameContextCreateMessage(2));
+            client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
+            client.SendPacket(new GameFightStartingMessage((uint)FightTypeEnum.FIGHT_TYPE_PvM, 1, (double)client.ActiveCharacter.Id, gameRolePlayAttackMonsterRequestMessage.monsterGroupId));
+
 
             client.SendPacket(new GameFightJoinMessage(true, false, true, false, 450, (uint)FightTypeEnum.FIGHT_TYPE_PvM));
             client.SendPacket(new GameFightPlacementPossiblePositionsMessage(map.FightStartingPosition.positionsForChallengers, map.FightStartingPosition.positionsForDefenders, 0));
 
             //Add monster to Defenders
             List<Fighter> monsters = new List<Fighter>();
-            foreach(var monster in monstergroup.Monsters)
+            foreach (var monster in monstergroup.Monsters)
             {
                 var cellUsed = monsters.Select(x => (uint)x.CellId).ToList();
                 var cellPlacementId = map.FightStartingPosition.positionsForDefenders.Find(x => !cellUsed.Contains(x));
 
                 //check dans fighters la cell utilisé
-                if(cellPlacementId != 0)
+                if (cellPlacementId != 0)
                     monsters.Add(new MonsterFighter(monster, (int)cellPlacementId)); //ajout des monstres
             }
 
@@ -76,6 +83,9 @@ namespace Burning.Emu.World.Frames
 
             if (fight.ActualFighter is CharacterFighter && fight.ActualFighter.Id == client.ActiveCharacter.Id)
                 fight.TurnEnd();
+
+
+            Console.WriteLine("Turn end ok");
         }
     }
 }

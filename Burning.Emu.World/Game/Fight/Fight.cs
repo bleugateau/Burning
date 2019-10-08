@@ -60,7 +60,7 @@ namespace Burning.Emu.World.Game.Fight
         {
             foreach (var fighter in this.Challengers.Concat(this.Defenders))
             {
-                IdentifiedEntityDispositionInformations identifiedEntityDispositionInformations = new IdentifiedEntityDispositionInformations((int)fighter.CellId, 1, fighter.Id);
+                IdentifiedEntityDispositionInformations identifiedEntityDispositionInformations = new IdentifiedEntityDispositionInformations((int)fighter.CellId, 1, (double)fighter.Id);
                 client.SendPacket(new GameEntitiesDispositionMessage(new List<IdentifiedEntityDispositionInformations>() { identifiedEntityDispositionInformations }));
 
                 if (fighter is CharacterFighter)

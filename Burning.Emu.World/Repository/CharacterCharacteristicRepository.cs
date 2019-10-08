@@ -40,6 +40,7 @@ namespace Burning.Emu.World.Repository
         {
             var characteristics = character.Characteristics;
 
+            characteristics.initiative.@base = 0;
             characteristics.agility.@base = 0;
             characteristics.chance.@base = 0;
             characteristics.intelligence.@base = 0;
@@ -84,6 +85,8 @@ namespace Burning.Emu.World.Repository
         {
             var characteristic = character.Characteristics;
 
+            int initiative = characteristic.initiative.objectsAndMountBonus;
+
             foreach(var effect in effects.Select(x => (ObjectEffectInteger)x))
             {
                 //EffectsEnum
@@ -125,6 +128,18 @@ namespace Burning.Emu.World.Repository
                             characteristic.wisdom.objectsAndMountBonus += (int)(effect.value);
                         else
                             characteristic.wisdom.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddVitality:
+                        if (!deApply)
+                            characteristic.vitality.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.vitality.objectsAndMountBonus -= (int)(effect.value);
+                        break;
+                    case EffectsEnum.Effect_AddInitiative:
+                        if (!deApply)
+                            characteristic.initiative.objectsAndMountBonus += (int)(effect.value);
+                        else
+                            characteristic.initiative.objectsAndMountBonus -= (int)(effect.value);
                         break;
                 }
             }

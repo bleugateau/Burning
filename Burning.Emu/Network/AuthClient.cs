@@ -23,7 +23,7 @@ namespace Burning.Emu.Network
         public AuthClient(Socket socket) : base(socket)
         {
             Console.WriteLine("New client connected {0}", this.Socket.RemoteEndPoint.ToString());
-            this.SendPacket(new ProtocolRequired(1912, 1912));
+            this.SendPacket(new ProtocolRequired(1945, 1945));
 
             #region key
 

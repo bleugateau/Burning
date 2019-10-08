@@ -152,8 +152,9 @@ namespace Burning.Emu.World.Entity
 
             ActorExtendedAlignmentInformations actorExtendedAlignment = new ActorExtendedAlignmentInformations(0, 0, 0, 0, 0, 0, 0, 0);
 
+            characteristics.initiative.@base += (characteristics.agility.@base + characteristics.chance.@base + characteristics.intelligence.@base + characteristics.strength.@base + characteristics.vitality.@base + characteristics.wisdom.@base);
+            characteristics.initiative.objectsAndMountBonus += (characteristics.chance.objectsAndMountBonus + characteristics.intelligence.objectsAndMountBonus + characteristics.strength.objectsAndMountBonus + characteristics.vitality.objectsAndMountBonus + characteristics.wisdom.objectsAndMountBonus);
 
-            characteristics.initiative.@base = (characteristics.agility.@base + characteristics.chance.@base + characteristics.intelligence.@base + characteristics.strength.@base + characteristics.vitality.@base + characteristics.wisdom.@base);
 
 
             return new CharacterCharacteristicsInformations(this.Experience, 0, 1000, 0, this.Kamas, (uint)characteristics.CapitalPoint, 0, 0, actorExtendedAlignment,
