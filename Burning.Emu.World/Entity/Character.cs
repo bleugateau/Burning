@@ -101,7 +101,7 @@ namespace Burning.Emu.World.Entity
         {
             get
             {
-                return FightManager.Instance.Fights.Where(x => x.Defenders.Find(d => d is CharacterFighter && d.Id == this.Id) != null || x.Challengers.Find(c => c is CharacterFighter && c.Id == this.Id) != null).Select(f => f).FirstOrDefault();
+                return FightManager.Instance.Fights.Where(x => x.FightState != FightStateEnum.FIGHT_ENDED && x.Defenders.Find(d => d is CharacterFighter && d.Id == this.Id) != null || x.Challengers.Find(c => c is CharacterFighter && c.Id == this.Id) != null).Select(f => f).FirstOrDefault();
             }
         }
 

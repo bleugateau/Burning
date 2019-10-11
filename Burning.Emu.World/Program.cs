@@ -53,8 +53,8 @@ namespace Burning.Emu.World
             MapTransitionsRepository.Instance.Initialize("maps_transitions");
 
             //Manager
-            SpellEffectManager.Initialize();
-            CommandManager.Initialize();
+            SpellEffectManager.Instance.Initialize();
+            CommandManager.Instance.Initialize();
             GuildManager.Instance.Initialize();
             FightManager.Instance.Initialize();
 

@@ -76,7 +76,9 @@ namespace Burning.Emu.World.Game.PathFinder
                 for (int column = 0; column < 14; column++)
                 {
                     cell = currentMap.Cells[id];
-                    matrix.Add(id, new Cell(cell.MapChangeData != 0, cell.Mov /* && usedCells[id] == 0 */, true, column, loc3, id, new Point(loc1 + column, loc2 + column)));
+                    bool isUsedCell = usedCells.FirstOrDefault(x => x == id) == 0 ? false : true;
+                    
+                    matrix.Add(id, new Cell(cell.MapChangeData != 0, cell.Mov && !isUsedCell, true, column, loc3, id, new Point(loc1 + column, loc2 + column)));
                     id++;
                 }
                 loc1++;
@@ -84,7 +86,10 @@ namespace Burning.Emu.World.Game.PathFinder
                 for (int column = 0; column < 14; column++)
                 {
                     cell = currentMap.Cells[id];
-                    matrix.Add(id, new Cell(cell.MapChangeData != 0, cell.Mov /* && usedCells[id] == 0 */, true, column, loc3, id, new Point(loc1 + column, loc2 + column)));
+
+                    bool isUsedCell = usedCells.FirstOrDefault(x => x == id) == 0 ? false : true;
+                    matrix.Add(id, new Cell(cell.MapChangeData != 0, cell.Mov && !isUsedCell, true, column, loc3, id, new Point(loc1 + column, loc2 + column)));
+
                     id++;
                 }
                 loc3++;

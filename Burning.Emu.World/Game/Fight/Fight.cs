@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -8,10 +10,13 @@ using Burning.DofusProtocol.Enums;
 using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
+using Burning.Emu.World.Game.Fight.Brain;
 using Burning.Emu.World.Game.Fight.Effects;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.Emu.World.Game.Fight.Spell;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
+using Burning.Emu.World.Game.Shapes;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Network;
 using FlatyBot.Common.Network;
@@ -138,6 +143,12 @@ namespace Burning.Emu.World.Game.Fight
 
         public void TurnEnd()
         {
+            if (this.FightState != FightStateEnum.FIGHT_STARTED)
+            {
+                this.CloseTurnTimer();
+                return;
+            }
+
             //queue message
             List<NetworkMessage> messages = new List<NetworkMessage>();
             messages.Add(new GameFightTurnEndMessage((double)this.ActualFighter.Id)); //fin du tour
@@ -178,7 +189,7 @@ namespace Burning.Emu.World.Game.Fight
 
             int nextTurnSecondes = 320;
             if (this.ActualFighter is MonsterFighter)
-                nextTurnSecondes = 50;
+                nextTurnSecondes = 150;
 
             //calcul temps additionnel = time restant / 2 entier le plus bas
 
@@ -187,7 +198,29 @@ namespace Burning.Emu.World.Game.Fight
             this.SendToAllFighters(messages);
 
             this.StartTurnTimer(nextTurnSecondes);
+
+            if(this.ActualFighter is MonsterFighter)
+            {
+                //IA RUSHER
+                var nearestFighter = BrainManager.Instance.AIGetNearestFighter(this, (MonsterFighter)this.ActualFighter);
+                BrainManager.Instance.AIMoveToTarget(this, nearestFighter);
+                BrainManager.Instance.AILaunchSpellToTarget(this, nearestFighter);
+
+                this.TurnEnd();
+            }
         }
+        
+        public void SendSequence(SequenceTypeEnum sequenceType, List<NetworkMessage> messages)
+        {
+            if (this.FightState == FightStateEnum.FIGHT_ENDED)
+                return;
+
+            messages.Insert(0, new SequenceStartMessage((int)sequenceType, this.ActualFighter.Id));
+            messages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)sequenceType));
+
+            this.SendToAllFighters(messages);
+        }
+
 
         public void MovementRequestSequence(int requestedCellId)
         {
@@ -210,13 +243,17 @@ namespace Burning.Emu.World.Game.Fight
             this.ActualFighter.CellId = MapManager.Instance.GetCellIdFromKeyMovement((int)cells[cells.Count - 1]);
             this.ActualFighter.PM -= cellDistance; //- distance
 
+            
             List<NetworkMessage> queueMessages = new List<NetworkMessage>();
-            queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_MOVE, this.ActualFighter.Id));
+            //queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_MOVE, this.ActualFighter.Id));
             queueMessages.Add(new GameMapMovementMessage(cells, 3, this.ActualFighter.Id));
             queueMessages.Add(new GameActionFightPointsVariationMessage(129, this.ActualFighter.Id, this.ActualFighter.Id, -(cellDistance)));
-            queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_MOVE));
+            //queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_MOVE));
 
-            this.SendToAllFighters(queueMessages);
+
+            SendSequence(SequenceTypeEnum.SEQUENCE_MOVE, queueMessages);
+
+            //this.SendToAllFighters(queueMessages);
         }
 
         public void CastSpellRequestSequence(int cellId, int spellId)
@@ -237,32 +274,41 @@ namespace Burning.Emu.World.Game.Fight
                 if (spellLevel.ApCost > this.ActualFighter.AP)
                     return;
 
-                var target = this.Challengers.Concat(this.Defenders).FirstOrDefault(x => x.CellId == cellId);
-                if (target == null)
-                    return;
-
-                List<NetworkMessage> queueMessages = new List<NetworkMessage>();
-                queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_SPELL, this.ActualFighter.Id));
-                queueMessages.Add(new GameActionFightSpellCastMessage(300, this.ActualFighter.Id, target.Id, cellId, 0, false, true, (uint)spellId, spellItem.spellLevel, new List<int>()));
-
-                queueMessages.Add(new GameActionFightPointsVariationMessage(102, this.ActualFighter.Id, this.ActualFighter.Id, -((int)spellLevel.ApCost)));
+                var map = MapManager.Instance.GetMap(this.MapId);
 
                 //on enleve les PA
                 this.ActualFighter.AP -= (int)spellLevel.ApCost;
+                bool castLaunched = false;
+                List<NetworkMessage> queueMessages = new List<NetworkMessage>();
+                foreach (var effect in spellLevel.Effects)
+                {
+                    var rawZone = new RawZone(effect.RawZone);
 
-                Console.WriteLine("LIFE BEFORE EFFECTMANAGER {0}pdv", target.Life);
+                    uint effectZoneStopAtTarget = effect.ZoneStopAtTarget != null ? (uint)effect.ZoneStopAtTarget : 0;
 
-                //manager for effects from spell
-                SpellEffectManager.BuildEffect(this.ActualFighter, target, spellLevel, queueMessages);
+                    var shapeZone = SpellZoneManager.Instance.getZone(map.MapData, rawZone.m_zoneShape, rawZone.m_zoneSize, rawZone.m_zoneMinSize, this.ActualFighter.CellId, cellId, false, effectZoneStopAtTarget, false);
+                    var targets = this.Challengers.Concat(this.Defenders).ToList().FindAll(x => shapeZone.getCells((uint)cellId).Contains((uint)x.CellId));
 
+                    foreach (var target in targets)
+                    {
 
-                Console.WriteLine("LIFE AFTER EFFECTMANAGER {0}pdv", target.Life);
+                        if(!castLaunched)
+                        {
+                            queueMessages.Add(new GameActionFightSpellCastMessage(300, this.ActualFighter.Id, target.Id, cellId, 0, false, true, (uint)spellId, spellItem.spellLevel, new List<int>()));
+                            castLaunched = true;
+                        }
+                            
+                        Console.WriteLine("LIFE BEFORE EFFECTMANAGER {0}pdv", target.Life);
 
-                //queueMessages.Add(new GameActionFightLifePointsLostMessage(300, this.ActualFighter.Id, target.Id, 1, 1, 1)); //si enemi perd pdv
-                queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_SPELL));
+                        //manager for effects from spell
+                        SpellEffectManager.Instance.BuildEffect(this.ActualFighter, target, effect, queueMessages);
 
-                this.SendToAllFighters(queueMessages);
+                        Console.WriteLine("LIFE AFTER EFFECTMANAGER {0}pdv", target.Life);
+                    }
+                }
+                queueMessages.Add(new GameActionFightPointsVariationMessage(102, this.ActualFighter.Id, this.ActualFighter.Id, -((int)spellLevel.ApCost)));
 
+                this.SendSequence(SequenceTypeEnum.SEQUENCE_SPELL, queueMessages);
             }
         }
 
@@ -311,7 +357,7 @@ namespace Burning.Emu.World.Game.Fight
 
 
                     messages.Add(new GameFightNewRoundMessage((uint)this.Round));
-                    messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, 320));
+                    messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, 50));
 
                     this.SendToAllFighters(messages);
 
@@ -321,7 +367,35 @@ namespace Burning.Emu.World.Game.Fight
                     //todo faire une fonction qui turnEnd
                     this.TurnEnd();
                     break;
+                case FightStateEnum.FIGHT_ENDED:
+                    if (this.TurnTimer.Enabled)
+                        this.TurnTimer.Stop();
+                    break;
             }
         }
+
+        public void EndFight()
+        {
+            this.FightState = FightStateEnum.FIGHT_ENDED;
+
+
+            this.CloseTurnTimer();
+
+            List<NetworkMessage> messages = new List<NetworkMessage>();
+            messages.Add(new GameFightEndMessage(0, 0, -1, new List<FightResultListEntry>(), new List<NamedPartyTeamWithOutcome>()));
+            //envoyer comme si on charge une map
+
+            this.SendToAllFighters(messages);
+
+            Console.WriteLine("Fin du fight");
+        }
+
+
+        private void CloseTurnTimer()
+        {
+            this.TurnTimer.Close();
+            this.TurnTimer.Dispose();
+        }
+
     }
 }

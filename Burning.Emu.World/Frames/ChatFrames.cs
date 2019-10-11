@@ -22,7 +22,7 @@ namespace Burning.Emu.World.Frames
         {
             if (chatClientMultiMessage.content.StartsWith("."))
             {
-                CommandManager.GetCommandeFromContent(chatClientMultiMessage.content, client);
+                CommandManager.Instance.GetCommandeFromContent(chatClientMultiMessage.content, client);
             }
             else
             {

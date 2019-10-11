@@ -19,6 +19,7 @@ namespace Burning.Emu.World.Game.Fight.Fighters
             this.CellId = cellId;
             this.Monster = monster;
 
+
             this.Life = monster.Grades[0].LifePoints;
             this.LifeBase = monster.Grades[0].LifePoints;
             this.AP = monster.Grades[0].ActionPoints;

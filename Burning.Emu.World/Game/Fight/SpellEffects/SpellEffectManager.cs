@@ -11,11 +11,11 @@ using System.Text;
 
 namespace Burning.Emu.World.Game.Fight.Effects
 {
-    public static class SpellEffectManager
+    public class SpellEffectManager : SingletonManager<SpellEffectManager>
     {
-        private static Dictionary<EffectsEnum, EffectData> EffectsList = new Dictionary<EffectsEnum, EffectData>();
+        private Dictionary<EffectsEnum, EffectData> EffectsList = new Dictionary<EffectsEnum, EffectData>();
 
-        public static void Initialize()
+        public void Initialize()
         {
             Assembly assembly = typeof(AbstractEffect).Assembly;
             foreach (var type in assembly.GetTypes().SelectMany(x => x.GetMethods()).Where(m => m.GetCustomAttributes(typeof(EffectEnumAttribute), false).Length > 0).ToArray())
@@ -24,24 +24,22 @@ namespace Burning.Emu.World.Game.Fight.Effects
                 Type stringType = Type.GetType(type.DeclaringType.FullName + ", " + assembly.GetName());
 
                 var instance = Activator.CreateInstance(stringType, null); // instance d'une methode
-                EffectsList.Add(attr.EffectsEnum, new EffectData(instance, type));
+                this.EffectsList.Add(attr.EffectsEnum, new EffectData(instance, type));
 
             }
 
-            Console.WriteLine("{0} spell effect(s) initialized.", EffectsList.Count);
+            Console.WriteLine("{0} spell effect(s) initialized.", this.EffectsList.Count);
         }
 
-        public static List<NetworkMessage> BuildEffect(Fighter caster, Fighter target, SpellLevel spellLevel, List<NetworkMessage> queueMessage)
+        public List<NetworkMessage> BuildEffect(Fighter caster, Fighter target, EffectInstanceDice effect, List<NetworkMessage> queueMessage)
         {
-            foreach (var effect in spellLevel.Effects)
+            if (!this.EffectsList.ContainsKey((EffectsEnum)effect.EffectId))
             {
-                if (!EffectsList.ContainsKey((EffectsEnum)effect.EffectId))
-                {
-                    Console.WriteLine("{0} effect not managed.", (EffectsEnum)effect.EffectId);
-                    continue;
-                }
-
-                var method = EffectsList[(EffectsEnum)effect.EffectId];
+                Console.WriteLine("{0} effect not managed.", (EffectsEnum)effect.EffectId);
+            }
+            else
+            {
+                var method = this.EffectsList[(EffectsEnum)effect.EffectId];
                 method.Methode.Invoke(method.Instance, new object[] { caster, target, effect, queueMessage });
             }
 
