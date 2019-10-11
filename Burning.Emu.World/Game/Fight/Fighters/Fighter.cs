@@ -46,9 +46,6 @@ namespace Burning.Emu.World.Game.Fight.Fighters
                 Console.WriteLine("JOUEUR MORT");
             }
 
-            var test = this.Fight.Challengers.FindAll(x => x.Life > 0);
-
-
             if ((this.Fight.Defenders.FindAll(x => x.Life > 0).Count == 0) || (this.Fight.Challengers.FindAll(x => x.Life > 0).Count == 0))
             {
                 this.Fight.EndFight();

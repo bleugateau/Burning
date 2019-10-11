@@ -143,11 +143,11 @@ namespace Burning.Emu.World.Game.Fight
 
         public void TurnEnd()
         {
+            TurnTimer.Stop();
+
+
             if (this.FightState != FightStateEnum.FIGHT_STARTED)
-            {
-                this.CloseTurnTimer();
                 return;
-            }
 
             //queue message
             List<NetworkMessage> messages = new List<NetworkMessage>();
@@ -197,6 +197,7 @@ namespace Burning.Emu.World.Game.Fight
 
             this.SendToAllFighters(messages);
 
+            
             this.StartTurnTimer(nextTurnSecondes);
 
             if(this.ActualFighter is MonsterFighter)
@@ -378,7 +379,7 @@ namespace Burning.Emu.World.Game.Fight
         {
             this.FightState = FightStateEnum.FIGHT_ENDED;
 
-
+            //fin du timer
             this.CloseTurnTimer();
 
             List<NetworkMessage> messages = new List<NetworkMessage>();
@@ -393,6 +394,10 @@ namespace Burning.Emu.World.Game.Fight
 
         private void CloseTurnTimer()
         {
+            if (!this.TurnTimer.Enabled)
+                return;
+
+
             this.TurnTimer.Close();
             this.TurnTimer.Dispose();
         }
