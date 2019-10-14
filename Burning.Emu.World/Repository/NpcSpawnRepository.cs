@@ -3,6 +3,7 @@ using Burning.Common.Managers.Database;
 using Burning.Common.Managers.Singleton;
 using Burning.Common.Repository;
 using Burning.DofusProtocol.Datacenter;
+using Burning.Emu.World.Entity;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;

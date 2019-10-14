@@ -1,4 +1,5 @@
-﻿using Burning.DofusProtocol.Network.Types;
+﻿using Burning.DofusProtocol.Enums;
+using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Network;
 using Burning.Emu.World.Repository;
@@ -12,9 +13,7 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public Character Character { get; set; }
 
-        public CharacterFighter() { }
-
-        public CharacterFighter(Character character, int cellId)
+        public CharacterFighter(TeamEnum team, Character character, int cellId) : base (team)
         {
             this.Id = character.Id;
             this.Character = character;

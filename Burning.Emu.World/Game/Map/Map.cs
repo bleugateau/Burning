@@ -15,6 +15,7 @@ using Burning.Common.Utility.EntityLook;
 using Burning.Emu.World.Game.Monster;
 using Burning.Emu.World.Game.Fight.Positions;
 using Burning.Emu.World.Game.PathFinder;
+using Burning.Emu.World.Entity;
 
 namespace Burning.Emu.World.Game.Map
 {
@@ -36,7 +37,13 @@ namespace Burning.Emu.World.Game.Map
 
         public FightStartingPositions FightStartingPosition { get; private set; }
 
+        private List<Fight.Fight> Fights { get; set; }
+
+        private List<WorldClient> ClientsOnMap { get; set; }
+
         private int MonsterGroupsLimit { get; set; }
+
+        private readonly object locker = new object();
 
         public Map(int mapId, Burning.DofusProtocol.Data.D2P.Map mapData, int monsterGroupsLimit = 3)
         {
@@ -49,7 +56,8 @@ namespace Burning.Emu.World.Game.Map
             this.MonstersGroups = FillMonstersGroups();
             this.FightStartingPosition = FightPositionsManager.Instance.BuildFromSchema(this);
             //startfightposition a faire
-
+            this.Fights = new List<Fight.Fight>();
+            this.ClientsOnMap = new List<WorldClient>();
             this.InteractiveElementList = new List<InteractiveElement>(); //a fill avec la db
             this.StatedElementList = new List<StatedElement>(); //a fill avec la db
         }
@@ -68,6 +76,111 @@ namespace Burning.Emu.World.Game.Map
             }
 
             return groupMonsters;
+        }
+
+        public List<GameRolePlayActorInformations> GetGameRolePlayActorInformations(WorldClient client)
+        {
+            List<GameRolePlayActorInformations> gameRolePlayActorInformations = new List<GameRolePlayActorInformations>();
+            foreach (var otherCharacter in this.ClientsOnMap.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.MapId == client.ActiveCharacter.MapId))
+            {
+                gameRolePlayActorInformations.Add(otherCharacter.ActiveCharacter.GetGameRolePlayCharacterInformations());
+                otherCharacter.SendPacket(new GameRolePlayShowActorMessage(client.ActiveCharacter.GetGameRolePlayCharacterInformations()));
+            }
+
+            gameRolePlayActorInformations.Add(client.ActiveCharacter.GetGameRolePlayCharacterInformations());
+
+            return gameRolePlayActorInformations;
+        }
+
+        public void SendGameMapMovementMessage(List<uint> keyMovements, WorldClient client)
+        {
+            foreach (var otherClients in this.ClientsOnMap.FindAll(x => x.ActiveCharacter.Id != client.ActiveCharacter.Id))
+            {
+                otherClients.SendPacket(new GameMapMovementMessage(keyMovements, 2, client.ActiveCharacter.Id));
+            }
+        }
+
+        public WorldClient GetClientFromCharacter(Character character)
+        {
+            lock(locker)
+            {
+                return this.ClientsOnMap.Find(x => x.ActiveCharacter.Id == character.Id);
+            }
+        }
+
+        public void EnterMap(WorldClient client)
+        {
+            lock (locker)
+            {
+                this.ClientsOnMap.Add(client);
+                //send update to other
+            }
+        }
+
+        public void ExitMap(WorldClient client)
+        {
+            lock (locker)
+            {
+                var clients = this.ClientsOnMap.FindAll(x => x != client);
+
+                if (this.ClientsOnMap.Contains(client))
+                    this.ClientsOnMap.Remove(client);
+
+                foreach (var otherClients in clients)
+                {
+                    otherClients.SendPacket(new GameContextRemoveElementMessage(client.ActiveCharacter.Id));
+                }
+            }
+        }
+
+        public void RemoveMonsterGroup(WorldClient client, MonsterGroup group)
+        {
+            lock (locker)
+            {
+                this.MonstersGroups.Remove(group);
+
+                foreach (var otherClients in this.ClientsOnMap.FindAll(x => x.ActiveCharacter.Id != client.ActiveCharacter.Id))
+                {
+                    otherClients.SendPacket(new GameContextRemoveElementMessage(group.Id));
+                    otherClients.SendPacket(new GameContextRemoveElementMessage(client.ActiveCharacter.Id));
+                }
+            }
+        }
+
+        public Fight.Fight GetFight(int fightId)
+        {
+            return this.Fights.Find(x => x.Id == fightId);
+        }
+
+        public void AddFight(WorldClient client, Fight.Fight fight)
+        {
+            lock(locker)
+            {
+                this.Fights.Add(fight);
+
+                foreach (var otherClients in this.ClientsOnMap.FindAll(x => x.ActiveCharacter.Id != client.ActiveCharacter.Id))
+                {
+                    //??
+                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 0, true));
+                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 1, 0, true));
+                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 1, true));
+
+                    otherClients.SendPacket(new GameRolePlayShowChallengeMessage(new FightCommonInformations((uint)fight.Id, (uint)fight.FightType, fight.GetFightTeamInformations(), 
+                        new List<uint>() { 452, 397 }, new List<FightOptionsInformations>(){
+                            new FightOptionsInformations(false, false, false,false),
+                            new FightOptionsInformations(false, false, false, false)
+                        })));
+                    otherClients.SendPacket(new MapFightCountMessage((uint)this.Fights.Count));
+                }
+            }
+        }
+
+        public void RemoveFight(Fight.Fight fight)
+        {
+            lock (locker)
+            {
+                this.Fights.Remove(fight);
+            }
         }
 
         public void ReloadNpc()

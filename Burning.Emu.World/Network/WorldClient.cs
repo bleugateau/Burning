@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using Burning.Emu.World.Entity;
+using Burning.Emu.World.Game.Map;
 
 namespace Burning.Emu.World.Network
 {
@@ -31,10 +32,9 @@ namespace Burning.Emu.World.Network
             //send remove element to other client in same map
             if (this.ActiveCharacter != null)
             {
-                foreach (var otherClient in WorldManager.Instance.GetNearestClientsFromCharacter(this.ActiveCharacter))
-                {
-                    otherClient.SendPacket(new GameContextRemoveElementMessage(this.ActiveCharacter.Id));
-                }
+                var map = MapManager.Instance.GetMap(this.ActiveCharacter.MapId);
+                if (map != null)
+                    map.ExitMap(this);
             }
 
             WorldManager.Instance.worldClients.Remove(this);

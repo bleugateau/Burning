@@ -43,12 +43,20 @@ namespace Burning.Emu.World.Game.Fight.Effects.Effect
 
         private void SendBaseEffect(Fighter caster, Fighter target, EffectInstanceDice effect, List<NetworkMessage> queueMessages)
         {
-            target.Life -= (int)effect.DiceNum;
+            if (target.Life > 0)
+            {
+                target.Life -= (int)effect.DiceNum;
 
-            queueMessages.Add(new GameActionFightLifePointsLostMessage(300, caster.Id, target.Id, effect.DiceNum, effect.DiceNum, effect.EffectElement)); //si enemi perd pdv
+                queueMessages.Add(new GameActionFightLifePointsLostMessage(283, caster.Id, target.Id, effect.DiceNum, effect.DiceNum, effect.EffectElement)); //si enemi perd pdv
 
-            //trigger event here
-            target.OnLifeLost();
+
+                if (target.Life <= 0)
+                    queueMessages.Add(new GameActionFightDeathMessage(103, caster.Id, target.Id));
+
+                //trigger event here
+                target.OnLifeLost();
+            }
+            
         }
 
     }

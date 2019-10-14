@@ -13,7 +13,7 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public Burning.DofusProtocol.Datacenter.Monster Monster { get; set; }
 
-        public MonsterFighter(Burning.DofusProtocol.Datacenter.Monster monster, int cellId)
+        public MonsterFighter(TeamEnum team, Burning.DofusProtocol.Datacenter.Monster monster, int cellId) : base (team)
         {
             this.Id = cellId * -1;
             this.CellId = cellId;

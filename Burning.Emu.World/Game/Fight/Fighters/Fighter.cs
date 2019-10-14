@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Burning.DofusProtocol.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,8 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public int CellId { get; set; }
 
+        public TeamEnum Team { get; set; }
+
         private Fight Fight
         {
             get
@@ -33,9 +36,9 @@ namespace Burning.Emu.World.Game.Fight.Fighters
             }
         }
 
-        public Fighter()
+        public Fighter(TeamEnum team)
         {
-            
+            this.Team = team;
         }
 
         public void OnLifeLost()

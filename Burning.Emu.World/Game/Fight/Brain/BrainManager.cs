@@ -20,9 +20,9 @@ namespace Burning.Emu.World.Game.Fight.Brain
     {
         public Fighter AIGetNearestFighter(Fight fight, MonsterFighter fighter)
         {
-            var map = MapManager.Instance.GetMap(fight.MapId);
+            var map = fight.Map;
 
-            var cellChallengers = fight.Challengers.Select(x => map.MapData.Cells.ToList().FirstOrDefault(c => c.Id == x.CellId)).ToList();
+            var cellChallengers = fight.Challengers.Where(c => c.Life > 0).Select(x => map.MapData.Cells.ToList().FirstOrDefault(c => c.Id == x.CellId)).ToList();
             var cellData = map.MapData.Cells.ToList().FirstOrDefault(x => x.Id == fighter.CellId);
 
             if (map != null)
@@ -43,7 +43,7 @@ namespace Burning.Emu.World.Game.Fight.Brain
         public void AIMoveToTarget(Fight fight, Fighter target)
         {
             var usedCells = fight.Defenders.Concat(fight.Challengers).Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
-            var map = MapManager.Instance.GetMap(fight.MapId);
+            var map = fight.Map;
 
             var path = new Pathfinder(usedCells);
             path.SetMap(map.MapData, false);

@@ -50,16 +50,11 @@ namespace Burning.Emu.World.Frames
             List<StatedElement> statedElements = new List<StatedElement>();
            
             List<uint> elementIds = new List<uint>();
-            
 
-            List<GameRolePlayActorInformations> gameRolePlayActorInformations = new List<GameRolePlayActorInformations>();
-            foreach(var otherCharacter in WorldManager.Instance.worldClients.FindAll(x => x.ActiveCharacter != null && x.ActiveCharacter.MapId == client.ActiveCharacter.MapId))
-            {
-                gameRolePlayActorInformations.Add(otherCharacter.ActiveCharacter.GetGameRolePlayCharacterInformations());
-                otherCharacter.SendPacket(new GameRolePlayShowActorMessage(client.ActiveCharacter.GetGameRolePlayCharacterInformations()));
-            }
+            //quand joueur entre sur la carte
+            map.EnterMap(client);
 
-            gameRolePlayActorInformations.Add(client.ActiveCharacter.GetGameRolePlayCharacterInformations());
+            List<GameRolePlayActorInformations> gameRolePlayActorInformations = map.GetGameRolePlayActorInformations(client);
 
             //npc
             List<GameRolePlayActorInformations> gameRolePlayNpcs = new List<GameRolePlayActorInformations>();
@@ -105,10 +100,8 @@ namespace Burning.Emu.World.Frames
             }
             else
             {
-                foreach (var otherClients in WorldManager.Instance.GetNearestClientsFromCharacter(client.ActiveCharacter))
-                {
-                    otherClients.SendPacket(new GameMapMovementMessage(gameMapMovementRequestMessage.keyMovements, 2, client.ActiveCharacter.Id));
-                }
+
+                map.SendGameMapMovementMessage(gameMapMovementRequestMessage.keyMovements, client);
 
                 client.ActiveCharacter.CellId = cellId;
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
@@ -128,15 +121,13 @@ namespace Burning.Emu.World.Frames
             if (!MapManager.Instance.CheckIfNextMapIsValid(client.ActiveCharacter.MapId, mapId, client.ActiveCharacter.CellId))
                 return;
 
+            var oldMap = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
             var map = MapManager.Instance.GetMap(mapId);
 
 
             if (map != null)
             {
-                foreach (var otherClients in WorldManager.Instance.GetNearestClientsFromCharacter(client.ActiveCharacter))
-                {
-                    otherClients.SendPacket(new GameContextRemoveElementMessage(client.ActiveCharacter.Id));
-                }
+                oldMap.ExitMap(client);
 
                 client.SendPacket(new GameContextDestroyMessage());
                 client.SendPacket(new GameContextCreateMessage(1));

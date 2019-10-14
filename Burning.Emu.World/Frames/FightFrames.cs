@@ -51,17 +51,41 @@ namespace Burning.Emu.World.Frames
 
                 //check dans fighters la cell utilisé
                 if (cellPlacementId != 0)
-                    monsters.Add(new MonsterFighter(monster, (int)cellPlacementId)); //ajout des monstres
+                    monsters.Add(new MonsterFighter(TeamEnum.TEAM_DEFENDER, monster, (int)cellPlacementId)); //ajout des monstres
             }
+
+            //on enléve le monster group
+            map.RemoveMonsterGroup(client, monstergroup);
 
             //add characters to challengers
             List<Fighter> characters = new List<Fighter>();
-            characters.Add(new CharacterFighter(client.ActiveCharacter, (int)map.FightStartingPosition.positionsForChallengers[0])); //ajout du character
+            characters.Add(new CharacterFighter(TeamEnum.TEAM_CHALLENGER, client.ActiveCharacter, (int)map.FightStartingPosition.positionsForChallengers[0])); //ajout du character
 
             //add fight to fightmanager
-            var fight = new Fight(client.ActiveCharacter.MapId, FightTypeEnum.FIGHT_TYPE_PvM, monsters, characters, map.FightStartingPosition);
+            var fight = new Fight(map, FightTypeEnum.FIGHT_TYPE_PvM, monsters, characters, map.FightStartingPosition);
             FightManager.Instance.Fights.Add(fight);
-            fight.EnterFight(client); //enter into fight
+            
+            fight.UpdateFightersDispositionInformations(client);
+
+            map.AddFight(client, fight);
+        }
+
+        [PacketId(GameFightJoinRequestMessage.Id)]
+        public void GameFightJoinRequestMessageFrame(WorldClient client, GameFightJoinRequestMessage gameFightJoinRequestMessage)
+        {
+            //regarder si le joueur est bien dans la meme map que le fight
+            //regarder si le fight est dans l'état PHASEMENT
+            var map = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
+
+            if (map == null)
+                return;
+
+            var fight = map.GetFight((int)gameFightJoinRequestMessage.fightId);
+
+            if (fight == null)
+                return;
+
+            fight.EnterFight(client);
         }
 
         [PacketId(GameFightPlacementPositionRequestMessage.Id)]

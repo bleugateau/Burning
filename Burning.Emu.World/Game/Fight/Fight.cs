@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -27,7 +28,7 @@ namespace Burning.Emu.World.Game.Fight
     {
         public int Id { get; set; }
 
-        public int MapId { get; set; }
+        public Map.Map Map { get; set; }
 
         public Fighter ActualFighter { get; set; }
 
@@ -41,18 +42,20 @@ namespace Burning.Emu.World.Game.Fight
 
         public FightStateEnum FightState { get; set; }
 
-        public List<WorldClient> clientsInFight { get; set; }
-
         public int Round { get; set; }
 
         private Timer TurnTimer { get; set; }
 
         private Timer PlacementPhaseTimer { get; set; }
 
-        public Fight(int mapId, FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
+        private Stopwatch ElapsdedTime { get; set; }
+
+        private readonly object locker = new object();
+
+        public Fight(Map.Map map, FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
         {
             this.Id = 1; //Uniqid a faire
-            this.MapId = mapId;
+            this.Map = map;
             this.FightType = type;
             this.Defenders = defenders;
             this.Challengers = challengers;
@@ -64,6 +67,60 @@ namespace Burning.Emu.World.Game.Fight
         }
 
         public void EnterFight(WorldClient client)
+        {
+            if (this.FightState != FightStateEnum.FIGHT_CHOICE_PLACEMENT)
+                return;
+
+            lock (locker)
+            {
+                uint freeCellId = this.FightStartingPositions.positionsForChallengers.Find(x => !this.Challengers.Select(c => (uint)c.CellId).ToList().Contains(x));
+
+                if (freeCellId == 0)
+                    return;
+
+
+                client.SendPacket(new GameContextDestroyMessage());
+                client.SendPacket(new GameContextCreateMessage(2));
+                client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
+
+
+                client.SendPacket(new GameFightJoinMessage(true, false, true, false, 450, (uint)FightTypeEnum.FIGHT_TYPE_PvM));
+                client.SendPacket(new GameFightPlacementPossiblePositionsMessage(this.Map.FightStartingPosition.positionsForChallengers, this.Map.FightStartingPosition.positionsForDefenders, 0));
+
+                var newFighter = new CharacterFighter(TeamEnum.TEAM_CHALLENGER, client.ActiveCharacter, (int)freeCellId);
+
+                this.Challengers.Add(newFighter);
+
+                //envoie au autres fighter le nouveau fighter
+                this.SendFighterDispositionInformations(newFighter);
+
+            }
+
+            //envoie la list des fighters déjà présent dans mon fight
+            this.UpdateFightersDispositionInformations(client);
+        }
+
+        public void SendFighterDispositionInformations(CharacterFighter newFighter)
+        {
+            foreach (var fighter in this.Challengers.Concat(this.Defenders).Where(x => x is CharacterFighter))
+            {
+
+                var characterFighter = (CharacterFighter)fighter;
+
+                var fighterClient = this.Map.GetClientFromCharacter(characterFighter.Character);
+
+                if (fighterClient == null)
+                    continue;
+
+                IdentifiedEntityDispositionInformations identifiedEntityDispositionInformations = new IdentifiedEntityDispositionInformations((int)newFighter.CellId, 1, (double)newFighter.Id);
+                fighterClient.SendPacket(new GameEntitiesDispositionMessage(new List<IdentifiedEntityDispositionInformations>() { identifiedEntityDispositionInformations }));
+
+                if (fighter is CharacterFighter)
+                    fighterClient.SendPacket(new GameFightShowFighterMessage(((CharacterFighter)newFighter).GetGameFightCharacterInformations()));
+            }
+        }
+
+        public void UpdateFightersDispositionInformations(WorldClient client)
         {
             foreach (var fighter in this.Challengers.Concat(this.Defenders))
             {
@@ -77,50 +134,100 @@ namespace Burning.Emu.World.Game.Fight
             }
         }
 
+        public List<FightTeamInformations> GetFightTeamInformations()
+        {
+            List<FightTeamInformations> fightTeamInformations = new List<FightTeamInformations>();
+
+            //challengers:
+            List<FightTeamMemberInformations> challengers = new List<FightTeamMemberInformations>();
+            foreach(var fighter in this.Challengers)
+            {
+                if(fighter is CharacterFighter)
+                {
+                    var characterFighter = (CharacterFighter)fighter;
+                    challengers.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                }
+            }
+
+            fightTeamInformations.Add(new FightTeamInformations((uint)TeamEnum.TEAM_CHALLENGER, this.Challengers[0].Id, 255, (uint)TeamEnum.TEAM_CHALLENGER, 0, challengers));
+
+            //defenders:
+            List<FightTeamMemberInformations> defenders = new List<FightTeamMemberInformations>();
+            foreach (var fighter in this.Defenders)
+            {
+                if (fighter is CharacterFighter)
+                {
+                    var characterFighter = (CharacterFighter)fighter;
+                    defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                }
+                else
+                {
+                    var monsterFighter = (MonsterFighter)fighter;
+                    defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                }
+            }
+            fightTeamInformations.Add(new FightTeamInformations((uint)TeamEnum.TEAM_DEFENDER, this.Defenders[0].Id, 255, (uint)TeamEnum.TEAM_DEFENDER, 0, defenders));
+
+            return fightTeamInformations;
+        }
+
+        public List<FightTeamMemberInformations> GetFightTeamMemberInformations()
+        {
+            List<FightTeamMemberInformations> challengers = new List<FightTeamMemberInformations>();
+            foreach (var fighter in this.Challengers)
+            {
+                if (fighter is CharacterFighter)
+                {
+                    var characterFighter = (CharacterFighter)fighter;
+                    challengers.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                }
+            }
+
+            List<FightTeamMemberInformations> defenders = new List<FightTeamMemberInformations>();
+            foreach (var fighter in this.Defenders)
+            {
+                if (fighter is CharacterFighter)
+                {
+                    var characterFighter = (CharacterFighter)fighter;
+                    defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                }
+                else
+                {
+                    var monsterFighter = (MonsterFighter)fighter;
+                    defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                }
+            }
+
+            return challengers.Concat(defenders).ToList();
+        }
+
         public bool CanChangeStartingPositions(WorldClient client, int requestedCellId)
         {
-
             if (this.FightState != FightStateEnum.FIGHT_CHOICE_PLACEMENT)
                 return false;
 
-            bool isDefender = this.Defenders.Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id) != null ? true : false;
+            CharacterFighter fighter = (CharacterFighter)this.Challengers.Concat(this.Defenders).ToList().Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id);
 
-            if(isDefender)
-            {
-                bool isStartingPos = this.FightStartingPositions.positionsForDefenders.Find(x => x == requestedCellId) != 0 ? true : false;
-                if (!isStartingPos)
-                    return false;
+            if (fighter == null)
+                return false;
 
-                bool isFreeCell = this.Defenders.Find(x => x.CellId == requestedCellId) != null ? true : false;
-                if (isFreeCell)
-                    return false;
 
-                //update cellid
-                this.Defenders.Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id).CellId = requestedCellId;
-            }
-            else
-            {
-                bool isStartingPos = this.FightStartingPositions.positionsForChallengers.Find(x => x == requestedCellId) != 0 ? true : false;
-                if (!isStartingPos)
-                    return false;
+            bool isStartingPos = fighter.Team == TeamEnum.TEAM_CHALLENGER ?
+                (this.FightStartingPositions.positionsForChallengers.Find(x => x == requestedCellId) != 0 ? true : false) :
+                (this.FightStartingPositions.positionsForDefenders.Find(x => x == requestedCellId) != 0 ? true : false);
 
-                bool isFreeCell = this.Challengers.Find(x => x.CellId == requestedCellId) != null ? true : false;
-                if (isFreeCell)
-                    return false;
+            if (!isStartingPos)
+                return false;
 
-                //update cellid
-                this.Challengers.Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id).CellId = requestedCellId;
-            }
+            bool isFreeCell = fighter.Team == TeamEnum.TEAM_CHALLENGER ?
+                (this.Challengers.Find(x => x.CellId == requestedCellId) != null ? false : true) :
+                (this.Defenders.Find(x => x.CellId == requestedCellId) != null ? false : true);
 
-            List<IdentifiedEntityDispositionInformations> dispositions = new List<IdentifiedEntityDispositionInformations>();
-            foreach (var fighter in this.Challengers.Concat(this.Defenders))
-            {
-                IdentifiedEntityDispositionInformations identifiedEntityDispositionInformations = new IdentifiedEntityDispositionInformations((int)fighter.CellId, 1, fighter.Id);
-                dispositions.Add(identifiedEntityDispositionInformations);
-            }
+            if (!isFreeCell)
+                return false;
 
-            //update position
-            client.SendPacket(new GameEntitiesDispositionMessage(dispositions));
+            fighter.CellId = requestedCellId;
+            this.SendFighterDispositionInformations(fighter);
 
             return true;
         }
@@ -226,10 +333,9 @@ namespace Burning.Emu.World.Game.Fight
         public void MovementRequestSequence(int requestedCellId)
         {
             var usedCells = this.Defenders.Concat(this.Challengers).Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
-            var map = MapManager.Instance.GetMap(this.MapId);
 
             var path = new Pathfinder(usedCells);
-            path.SetMap(map.MapData, false);
+            path.SetMap(this.Map.MapData, false);
 
             var cells = path.GetPath((short)this.ActualFighter.CellId, (short)requestedCellId).Select(x => (uint)x.Id).ToList();
 
@@ -246,10 +352,8 @@ namespace Burning.Emu.World.Game.Fight
 
             
             List<NetworkMessage> queueMessages = new List<NetworkMessage>();
-            //queueMessages.Add(new SequenceStartMessage((int)SequenceTypeEnum.SEQUENCE_MOVE, this.ActualFighter.Id));
             queueMessages.Add(new GameMapMovementMessage(cells, 3, this.ActualFighter.Id));
             queueMessages.Add(new GameActionFightPointsVariationMessage(129, this.ActualFighter.Id, this.ActualFighter.Id, -(cellDistance)));
-            //queueMessages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)SequenceTypeEnum.SEQUENCE_MOVE));
 
 
             SendSequence(SequenceTypeEnum.SEQUENCE_MOVE, queueMessages);
@@ -275,25 +379,25 @@ namespace Burning.Emu.World.Game.Fight
                 if (spellLevel.ApCost > this.ActualFighter.AP)
                     return;
 
-                var map = MapManager.Instance.GetMap(this.MapId);
-
                 //on enleve les PA
                 this.ActualFighter.AP -= (int)spellLevel.ApCost;
                 bool castLaunched = false;
                 List<NetworkMessage> queueMessages = new List<NetworkMessage>();
+
+                Dictionary<int, int> effectAlreadyApplyqued = new Dictionary<int, int>();
+
                 foreach (var effect in spellLevel.Effects)
                 {
                     var rawZone = new RawZone(effect.RawZone);
 
                     uint effectZoneStopAtTarget = effect.ZoneStopAtTarget != null ? (uint)effect.ZoneStopAtTarget : 0;
 
-                    var shapeZone = SpellZoneManager.Instance.getZone(map.MapData, rawZone.m_zoneShape, rawZone.m_zoneSize, rawZone.m_zoneMinSize, this.ActualFighter.CellId, cellId, false, effectZoneStopAtTarget, false);
+                    var shapeZone = SpellZoneManager.Instance.getZone(this.Map.MapData, rawZone.m_zoneShape, rawZone.m_zoneSize, rawZone.m_zoneMinSize, this.ActualFighter.CellId, cellId, false, effectZoneStopAtTarget, false);
                     var targets = this.Challengers.Concat(this.Defenders).ToList().FindAll(x => shapeZone.getCells((uint)cellId).Contains((uint)x.CellId));
 
                     foreach (var target in targets)
                     {
-
-                        if(!castLaunched)
+                        if (!castLaunched)
                         {
                             queueMessages.Add(new GameActionFightSpellCastMessage(300, this.ActualFighter.Id, target.Id, cellId, 0, false, true, (uint)spellId, spellItem.spellLevel, new List<int>()));
                             castLaunched = true;
@@ -340,6 +444,9 @@ namespace Burning.Emu.World.Game.Fight
                 case FightStateEnum.FIGHT_CHOICE_PLACEMENT:
                     PlacementPhaseTimer.Stop();
 
+                    this.ElapsdedTime = new Stopwatch();
+                    this.ElapsdedTime.Start();
+
                     //actualise l'ordre dans la timeline
                     var orderedFighters = this.Challengers.Concat(this.Defenders).OrderByDescending(x => x.Initiative).ToList();
                     for(int i = 0; i < orderedFighters.Count; i++)
@@ -381,9 +488,10 @@ namespace Burning.Emu.World.Game.Fight
 
             //fin du timer
             this.CloseTurnTimer();
+            this.ElapsdedTime.Stop();
 
             List<NetworkMessage> messages = new List<NetworkMessage>();
-            messages.Add(new GameFightEndMessage(0, 0, -1, new List<FightResultListEntry>(), new List<NamedPartyTeamWithOutcome>()));
+            messages.Add(new GameFightEndMessage((uint)this.ElapsdedTime.ElapsedMilliseconds, 0, -1, new List<FightResultListEntry>(), new List<NamedPartyTeamWithOutcome>()));
             //envoyer comme si on charge une map
 
             this.SendToAllFighters(messages);
