@@ -50,6 +50,8 @@ namespace Burning.Emu.World.Game.Fight
 
         private Stopwatch ElapsdedTime { get; set; }
 
+        private TeamEnum TeamWinner { get; set; }
+
         private readonly object locker = new object();
 
         public Fight(Map.Map map, FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
@@ -81,9 +83,10 @@ namespace Burning.Emu.World.Game.Fight
 
                 client.SendPacket(new GameContextDestroyMessage());
                 client.SendPacket(new GameContextCreateMessage(2));
+
                 client.SendPacket(new CharacterStatsListMessage(client.ActiveCharacter.GetCharacterCharacteristicsInformations()));
 
-
+                client.SendPacket(new GameFightStartingMessage((uint)this.FightType, (uint)this.Id, this.Challengers[0].Id, this.Defenders[0].Id));
                 client.SendPacket(new GameFightJoinMessage(true, false, true, false, 450, (uint)FightTypeEnum.FIGHT_TYPE_PvM));
                 client.SendPacket(new GameFightPlacementPossiblePositionsMessage(this.Map.FightStartingPosition.positionsForChallengers, this.Map.FightStartingPosition.positionsForDefenders, 0));
 
@@ -201,6 +204,15 @@ namespace Burning.Emu.World.Game.Fight
             return challengers.Concat(defenders).ToList();
         }
 
+        public FightCommonInformations GetFightCommonInformations()
+        {
+            return new FightCommonInformations((uint)this.Id, (uint)this.FightType, this.GetFightTeamInformations(),
+                        new List<uint>() { 452, 397 }, new List<FightOptionsInformations>(){
+                            new FightOptionsInformations(false, false, false,false),
+                            new FightOptionsInformations(false, false, false, false)
+                        });
+        }
+
         public bool CanChangeStartingPositions(WorldClient client, int requestedCellId)
         {
             if (this.FightState != FightStateEnum.FIGHT_CHOICE_PLACEMENT)
@@ -245,7 +257,6 @@ namespace Burning.Emu.World.Game.Fight
                     }
                 }
             }
-
         }
 
         public void TurnEnd()
@@ -454,6 +465,9 @@ namespace Burning.Emu.World.Game.Fight
                         orderedFighters[i].TimelineOrder = (i + 1);
                     }
 
+                    //remove le fight affiché sur la map car plus possible de le rejoindre
+                    this.Map.RemoveFightInformationsOnMap(this.Id);
+
 
                     List<NetworkMessage> messages = new List<NetworkMessage>();
                     messages.Add(new GameFightStartMessage(new List<Idol>()));
@@ -485,13 +499,41 @@ namespace Burning.Emu.World.Game.Fight
         public void EndFight()
         {
             this.FightState = FightStateEnum.FIGHT_ENDED;
+            this.TeamWinner = this.Challengers.FindAll(x => x.Life > 0).Count != 0 ? TeamEnum.TEAM_CHALLENGER : TeamEnum.TEAM_DEFENDER;
 
             //fin du timer
             this.CloseTurnTimer();
             this.ElapsdedTime.Stop();
 
+            //on enleve le fight de la map
+            this.Map.RemoveFight(this);
+
             List<NetworkMessage> messages = new List<NetworkMessage>();
-            messages.Add(new GameFightEndMessage((uint)this.ElapsdedTime.ElapsedMilliseconds, 0, -1, new List<FightResultListEntry>(), new List<NamedPartyTeamWithOutcome>()));
+
+            List<FightResultListEntry> fightResultLists = new List<FightResultListEntry>();
+
+            foreach (var fighter in this.Defenders.Concat(this.Challengers))
+            {
+                //winner = 2 - looser = 0
+                int outcome = fighter.Team == this.TeamWinner ? 2 : 0;
+                if(fighter is CharacterFighter)
+                {
+                    var charactFighter = (CharacterFighter)fighter;
+                    int expEarned = FightManager.Instance.getExperienceEarned(charactFighter.Character, this);
+                    int kamas = FightManager.Instance.getKamasEarned(charactFighter.Character, this);
+
+                    fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(new List<uint>(), kamas), fighter.Id, fighter.Life > 0, (uint)charactFighter.Character.Level, new List<FightResultAdditionalData>()
+                    {
+                        new FightResultExperienceData(charactFighter.Character.Experience + expEarned, true, 0, true, 1000, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
+                    }));
+                }
+                else
+                {
+                    fightResultLists.Add(new FightResultFighterListEntry((uint)outcome, 0, new FightLoot(), fighter.Id, fighter.Life > 0));
+                }
+            }
+
+            messages.Add(new GameFightEndMessage((uint)this.ElapsdedTime.ElapsedMilliseconds, 0, -1, fightResultLists, new List<NamedPartyTeamWithOutcome>()));
             //envoyer comme si on charge une map
 
             this.SendToAllFighters(messages);

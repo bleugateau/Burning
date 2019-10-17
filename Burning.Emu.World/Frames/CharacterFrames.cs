@@ -366,7 +366,7 @@ namespace Burning.Emu.World.Frames
                 client.SendPacket(new GuildBulletinMessage(guild.Bulletin, 0, 1, client.ActiveCharacter.Name, 0));
             }
 
-            client.SendPacket(new ChatServerMessage(10, "Bienvenue sur l'émulateur Burning développé par Ten.", 0, "", 0, "", "", 0));
+            client.SendPacket(new ChatServerMessage(10, "Bienvenue sur l'émulateur <b>Burning</b> développé par <b>Ten</b>.", 0, "", 0, "", "", 0));
         }
 
         /*

@@ -67,14 +67,13 @@ namespace Burning.Emu.World.Frames
             
             fight.UpdateFightersDispositionInformations(client);
 
+            //ajout du fight sur la map
             map.AddFight(client, fight);
         }
 
         [PacketId(GameFightJoinRequestMessage.Id)]
         public void GameFightJoinRequestMessageFrame(WorldClient client, GameFightJoinRequestMessage gameFightJoinRequestMessage)
         {
-            //regarder si le joueur est bien dans la meme map que le fight
-            //regarder si le fight est dans l'état PHASEMENT
             var map = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
 
             if (map == null)

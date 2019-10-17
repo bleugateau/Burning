@@ -158,20 +158,36 @@ namespace Burning.Emu.World.Game.Map
             {
                 this.Fights.Add(fight);
 
-                foreach (var otherClients in this.ClientsOnMap.FindAll(x => x.ActiveCharacter.Id != client.ActiveCharacter.Id))
+                foreach (var otherClient in this.ClientsOnMap.FindAll(x => x.ActiveCharacter.Id != client.ActiveCharacter.Id))
                 {
                     //??
-                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 0, true));
-                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 1, 0, true));
-                    otherClients.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 1, true));
+                    otherClient.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 0, true));
+                    otherClient.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 1, 0, true));
+                    otherClient.SendPacket(new GameFightOptionStateUpdateMessage((uint)fight.Id, 0, 1, true));
 
-                    otherClients.SendPacket(new GameRolePlayShowChallengeMessage(new FightCommonInformations((uint)fight.Id, (uint)fight.FightType, fight.GetFightTeamInformations(), 
-                        new List<uint>() { 452, 397 }, new List<FightOptionsInformations>(){
-                            new FightOptionsInformations(false, false, false,false),
-                            new FightOptionsInformations(false, false, false, false)
-                        })));
-                    otherClients.SendPacket(new MapFightCountMessage((uint)this.Fights.Count));
+                    otherClient.SendPacket(new GameRolePlayShowChallengeMessage(fight.GetFightCommonInformations()));
+                    otherClient.SendPacket(new MapFightCountMessage((uint)this.Fights.Count));
                 }
+            }
+        }
+
+        public List<FightCommonInformations> GetFightInformationsOnMap()
+        {
+            List<FightCommonInformations> fightCommons = new List<FightCommonInformations>();
+
+            foreach (var fight in this.Fights.Where(x => x.FightState == Fight.FightStateEnum.FIGHT_CHOICE_PLACEMENT))
+            {
+                fightCommons.Add(fight.GetFightCommonInformations());
+            }
+
+            return fightCommons;
+        }
+
+        public void RemoveFightInformationsOnMap(int fightId)
+        {
+            foreach(var client in this.ClientsOnMap)
+            {
+                client.SendPacket(new GameRolePlayRemoveChallengeMessage((uint)fightId));
             }
         }
 
@@ -180,6 +196,11 @@ namespace Burning.Emu.World.Game.Map
             lock (locker)
             {
                 this.Fights.Remove(fight);
+
+                foreach(var client in this.ClientsOnMap)
+                {
+                    client.SendPacket(new MapFightCountMessage((uint)this.Fights.Count));
+                }
             }
         }
 

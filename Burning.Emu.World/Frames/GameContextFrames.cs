@@ -70,7 +70,7 @@ namespace Burning.Emu.World.Frames
             }
 
             client.SendPacket(new MapComplementaryInformationsDataMessage((uint)map.MapData.SubAreaId, client.ActiveCharacter.MapId, new List<HouseInformations>(), gameRolePlayActorInformations, interactiveElements,
-                statedElements, new List<MapObstacle>(), new List<FightCommonInformations>(), true, map.FightStartingPosition));
+                statedElements, new List<MapObstacle>(), map.GetFightInformationsOnMap(), true, map.FightStartingPosition));
 
             client.SendPacket(new GameRolePlayShowMultipleActorsMessage(gameRolePlayNpcs));
             client.SendPacket(new SetCharacterRestrictionsMessage(client.ActiveCharacter.Id, new ActorRestrictionsInformations()));
