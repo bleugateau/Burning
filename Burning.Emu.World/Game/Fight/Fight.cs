@@ -20,6 +20,7 @@ using Burning.Emu.World.Game.PathFinder;
 using Burning.Emu.World.Game.Shapes;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Network;
+using Burning.Emu.World.Repository;
 using FlatyBot.Common.Network;
 
 namespace Burning.Emu.World.Game.Fight
@@ -309,13 +310,10 @@ namespace Burning.Emu.World.Game.Fight
             if (this.ActualFighter is MonsterFighter)
                 nextTurnSecondes = 150;
 
-            //calcul temps additionnel = time restant / 2 entier le plus bas
-
             messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, (uint)nextTurnSecondes)); //nouveau tour
 
             this.SendToAllFighters(messages);
 
-            
             this.StartTurnTimer(nextTurnSecondes);
 
             if(this.ActualFighter is MonsterFighter)
@@ -327,19 +325,45 @@ namespace Burning.Emu.World.Game.Fight
 
                 this.TurnEnd();
             }
+            else
+            {
+                this.SynchronizeSequence((CharacterFighter)this.ActualFighter);
+            }
         }
         
-        public void SendSequence(SequenceTypeEnum sequenceType, List<NetworkMessage> messages)
+        public void SendSequence(SequenceTypeEnum sequenceType, List<NetworkMessage> messages, uint actionId = 3)
         {
             if (this.FightState == FightStateEnum.FIGHT_ENDED)
                 return;
 
             messages.Insert(0, new SequenceStartMessage((int)sequenceType, this.ActualFighter.Id));
-            messages.Add(new SequenceEndMessage(3, this.ActualFighter.Id, (int)sequenceType));
+            messages.Add(new SequenceEndMessage(actionId, this.ActualFighter.Id, (int)sequenceType));
 
             this.SendToAllFighters(messages);
         }
 
+        private void SynchronizeSequence(CharacterFighter characterFighter)
+        {
+            List<NetworkMessage> messages = new List<NetworkMessage>();
+
+            messages.Add(characterFighter.GetFighterStatsListMessage());
+
+            List<GameFightFighterInformations> fightFighterInformations = new List<GameFightFighterInformations>();
+
+            foreach (var fighter in this.Challengers.Concat(this.Defenders))
+            {
+               
+                if (fighter is CharacterFighter)
+                    fightFighterInformations.Add(((CharacterFighter)fighter).GetGameFightCharacterInformations());
+                else if (fighter is MonsterFighter)
+                    fightFighterInformations.Add(((MonsterFighter)fighter).GetGameFightMonsterInformations());
+            }
+
+            messages.Add(new GameFightSynchronizeMessage(fightFighterInformations));
+
+            this.SendSequence(SequenceTypeEnum.SEQUENCE_TURN_START, messages, 70);
+
+        }
 
         public void MovementRequestSequence(int requestedCellId)
         {
@@ -477,7 +501,6 @@ namespace Burning.Emu.World.Game.Fight
                     this.Round = 1;
                     this.FightState = FightStateEnum.FIGHT_STARTED;
 
-
                     messages.Add(new GameFightNewRoundMessage((uint)this.Round));
                     messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, 50));
 
@@ -519,10 +542,17 @@ namespace Burning.Emu.World.Game.Fight
                 if(fighter is CharacterFighter)
                 {
                     var charactFighter = (CharacterFighter)fighter;
-                    int expEarned = FightManager.Instance.getExperienceEarned(charactFighter.Character, this);
+                    var client = this.Map.GetClientFromCharacter(charactFighter.Character);
+
+                    int expEarned = FightManager.Instance.GetExperienceEarned(charactFighter.Character, this);
+                    var loots = FightManager.Instance.GetDropEarned(charactFighter.Character, this);
                     int kamas = FightManager.Instance.getKamasEarned(charactFighter.Character, this);
 
-                    fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(new List<uint>(), kamas), fighter.Id, fighter.Life > 0, (uint)charactFighter.Character.Level, new List<FightResultAdditionalData>()
+
+                    FightManager.Instance.SaveCharacterEndFightProgress(this.Map, charactFighter.Character, loots, expEarned, kamas);
+                    
+
+                    fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(loots, kamas), fighter.Id, fighter.Life > 0, (uint)charactFighter.Character.Level, new List<FightResultAdditionalData>()
                     {
                         new FightResultExperienceData(charactFighter.Character.Experience + expEarned, true, 0, true, 1000, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
                     }));

@@ -158,7 +158,7 @@ namespace Burning.Emu.World.Game.Fight.Positions
 
         private uint GetWalkableCell(Map.Map map, uint cellId, List<uint> cellDestination)
         {
-            var cellWalkable = map.MapData.Cells.ToList().FindAll(x => x.Walkable && x.isObstacle() != true);
+            var cellWalkable = map.MapData.Cells.ToList().FindAll(x => x.Walkable && x.isObstacle() != true && !x.NonWalkableDuringFight);
             var cellData = map.MapData.Cells.ToList().FirstOrDefault(x => x.Id == cellId);
 
             if (map != null)

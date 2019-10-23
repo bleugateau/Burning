@@ -161,7 +161,7 @@ namespace Burning.Emu.World.Frames
                 tackleBlock = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
                 actionPoints = new CharacterBaseCharacteristic(6, 0, 0, 0, 0),
                 prospecting = new CharacterBaseCharacteristic(100, 0, 0, 0, 0),
-                initiative = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
+                initiative = new CharacterBaseCharacteristic(100, 0, 0, 0, 0),
                 tackleEvade = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
                 strength = new CharacterBaseCharacteristic(0, 0, 0, 0, 0),
                 movementPoints = new CharacterBaseCharacteristic(3, 0, 0, 0, 0),

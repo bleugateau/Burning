@@ -1,4 +1,5 @@
 ﻿using Burning.DofusProtocol.Enums;
+using Burning.DofusProtocol.Network.Messages;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Network;
@@ -45,6 +46,11 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
 
             return new GameFightCharacterInformations((double)this.Id, new EntityDispositionInformations(this.CellId, 1), character.Look, new GameContextBasicSpawnInformation(0, true, positionInformations), 0, gameFightMinimalStats, new List<uint>(), character.Name, new PlayerStatus(1), -1, 0, false, (uint)character.Level, actorExtendedAlignment, character.Breed, character.Sex);
+        }
+
+        public FighterStatsListMessage GetFighterStatsListMessage()
+        {
+            return new FighterStatsListMessage(this.Character.GetCharacterCharacteristicsInformations());
         }
 
         public void ResetFighter()

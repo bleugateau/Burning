@@ -1,6 +1,9 @@
 ﻿using Burning.Common.Managers.Singleton;
+using Burning.DofusProtocol.Datacenter;
+using Burning.DofusProtocol.Network.Messages;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.Emu.World.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,20 +17,101 @@ namespace Burning.Emu.World.Game.Fight
 
         private double[] palierGroup = new double[] { 1, 1.1, 1.5, 2.3, 3.1, 3.6, 4.2, 4.7 };
 
+        private Random random = new Random();
+
         public void Initialize()
         {
             this.Fights = new List<Fight>();
         }
 
-        private int truncate(double param1)
+        public void SaveCharacterEndFightProgress(Map.Map map, Character character, List<uint> loots, int experienceEarned, int kamasEarned)
         {
-            double _loc_2 = Math.Pow(10, 0);
-            int _loc_3 = (int)(param1 * _loc_2);
-            return (int)((_loc_3) / _loc_2);
+            var client = map.GetClientFromCharacter(character);
+            var inventory = character.Inventory;
+
+            character.Experience += experienceEarned;
+
+            if (experienceEarned > 1000) //gerer l'exp TODO
+            {
+                character.Level += 1;
+
+                if(client != null)
+                    client.SendPacket(new CharacterLevelUpMessage((uint)character.Level));
+            }
+
+            character.Kamas += kamasEarned;
+
+            foreach (var loot in loots)
+            {
+                var item = InventoryRepository.Instance.GenerateItemFromId((int)loot);
+
+                if (item == null)
+                    continue;
+
+                inventory.ObjectItems.Add(InventoryRepository.Instance.GenerateItemFromId((int)loot));
+
+                if (client == null)
+                    continue;
+                client.SendPacket(new ObjectAddedMessage(item, 0));
+                client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
+            }
+
+            CharacterRepository.Instance.Update(character);
+            InventoryRepository.Instance.Update(inventory);
+
+            if (client != null)
+                client.ActiveCharacter = character;
         }
 
+        public List<uint> GetDropEarned(Character character, Fight fight)
+        {
+            var monsters = fight.Defenders.Where(x => x.Life <= 0).Select(x => (MonsterFighter)x).ToList();
+            var client = fight.Map.GetClientFromCharacter(character);
 
-        public int getExperienceEarned(Character character, Fight fight)
+            List<uint> drops = new List<uint>();
+
+            foreach(var monster in monsters)
+            {
+                foreach(var loot in monster.Monster.Drops.Where(x => x.Criteria == "null"))
+                {
+                    //calcul sur dofus pour les noobs a prendre
+                    if(this.IsDropEarned((int)loot.PercentDropForGrade1 * (character.Characteristics.prospecting.Total / 100)))
+                    {
+                        drops.Add((uint)loot.ObjectId);
+                        drops.Add(1);
+                        Console.WriteLine("Dropped {1} with {0}%", loot.PercentDropForGrade1, loot.ObjectId);
+                    }
+                }
+            }
+
+            return drops;
+        }
+
+        private bool IsDropEarned(int dropPourcentage)
+        {
+            List<int> diceNumbers = new List<int>();
+            Random random = new Random();
+
+            if (dropPourcentage >= 100)
+                return true;
+
+            for (int i = 0; i < dropPourcentage; i++)
+            {
+                List<int> range = Enumerable.Range(1, 100).Where(x => !diceNumbers.Contains(x)).ToList();
+
+                int index = random.Next(0, range.Count);
+                int dice = range.ElementAt(index);
+
+                diceNumbers.Add(dice);
+            }
+
+            if (diceNumbers.Contains(this.random.Next(1, 100 + 1)))
+                return true;
+
+            return false;
+        }
+
+        public int GetExperienceEarned(Character character, Fight fight)
         {
             var monsters = fight.Defenders.Where(x => x.Life <= 0).Select(x => (MonsterFighter)x).ToList();
             var characters = fight.Challengers.Select(x => (CharacterFighter)x).ToList();

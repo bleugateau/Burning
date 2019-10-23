@@ -32,7 +32,7 @@ namespace Burning.Common.Repository
 
         public Item GetItemDataById(int id)
         {
-            var item = this.List.Find(x => x.id == id);
+            var item = this.List.Find(x => x != null && x.id == id);
 
             if (item == null)
             {

@@ -20,7 +20,40 @@ namespace Burning.D2oSync
         static void Main(string[] args)
         {
             Database = new MongoClient("mongodb://localhost").GetDatabase("burning_datacenter253");
-            //GetBreeds(BasePath);
+            GetDindeXpMapping();
+
+            Console.ReadKey();
+        }
+
+        public static void GetDindeXpMapping()
+        {
+            int oldValue = 450;
+            for(int i = 1; i < 201; i++)
+            {
+                int result = oldValue + 250;
+                oldValue = result;
+                Console.WriteLine("LVL {0} XP necessaire {1}", i, result);
+            }
+        }
+
+        public static void GetJobXpMapping(string basePath)
+        {
+            int baseValue = 0;
+            int oldBaseValue = 0;
+
+            for(int i = 1; i < 201; i++)
+            {
+                int result = baseValue + (baseValue - oldBaseValue) + 20;
+                if (i == 1)
+                {
+                    result = 20;
+                }
+
+                oldBaseValue = baseValue;
+                baseValue = result;
+
+                Console.WriteLine("LVL {0} XP necessaire {1}", i, result);
+            }
         }
 
         public static void GetNpcs(string basePath)

@@ -48,6 +48,9 @@ namespace Burning.Emu.World.Repository
         {
             var itemTemplate = ItemRepository.Instance.GetItemDataById(id);
 
+            if (itemTemplate == null)
+                return null;
+
             var item = new ObjectItem();
             item.objectGID = (uint)itemTemplate.id;
             item.objectUID = (uint)GetUniqID(); //generate objectUID

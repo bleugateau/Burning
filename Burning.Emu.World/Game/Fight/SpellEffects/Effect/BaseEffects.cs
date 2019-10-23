@@ -47,7 +47,7 @@ namespace Burning.Emu.World.Game.Fight.Effects.Effect
             {
                 target.Life -= (int)effect.DiceNum;
 
-                queueMessages.Add(new GameActionFightLifePointsLostMessage(283, caster.Id, target.Id, effect.DiceNum, effect.DiceNum, effect.EffectElement)); //si enemi perd pdv
+                queueMessages.Add(new GameActionFightLifePointsLostMessage(283, caster.Id, target.Id, effect.DiceNum, (uint)(effect.DiceNum / 10), effect.EffectElement));
 
 
                 if (target.Life <= 0)
