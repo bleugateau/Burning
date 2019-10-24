@@ -100,7 +100,6 @@ namespace Burning.Emu.World.Frames
             }
             else
             {
-
                 map.SendGameMapMovementMessage(gameMapMovementRequestMessage.keyMovements, client);
 
                 client.ActiveCharacter.CellId = cellId;

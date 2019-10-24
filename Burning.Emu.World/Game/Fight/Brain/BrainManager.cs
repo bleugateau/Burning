@@ -42,6 +42,10 @@ namespace Burning.Emu.World.Game.Fight.Brain
 
         public void AIMoveToTarget(Fight fight, Fighter target)
         {
+
+            if (target == null)
+                return;
+
             var usedCells = fight.Defenders.Concat(fight.Challengers).Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
             var map = fight.Map;
 

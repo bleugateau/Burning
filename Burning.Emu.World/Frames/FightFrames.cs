@@ -44,14 +44,14 @@ namespace Burning.Emu.World.Frames
 
             //Add monster to Defenders
             List<Fighter> monsters = new List<Fighter>();
-            foreach (var monster in monstergroup.Monsters)
+            for(int i = 0; i < monstergroup.Monsters.Count; i++)
             {
                 var cellUsed = monsters.Select(x => (uint)x.CellId).ToList();
                 var cellPlacementId = map.FightStartingPosition.positionsForDefenders.Find(x => !cellUsed.Contains(x));
 
                 //check dans fighters la cell utilisé
                 if (cellPlacementId != 0)
-                    monsters.Add(new MonsterFighter(TeamEnum.TEAM_DEFENDER, monster, (int)cellPlacementId)); //ajout des monstres
+                    monsters.Add(new MonsterFighter((i + 1) * -1, TeamEnum.TEAM_DEFENDER, monstergroup.Monsters[i], (int)cellPlacementId)); //ajout des monstres
             }
 
             //on enléve le monster group

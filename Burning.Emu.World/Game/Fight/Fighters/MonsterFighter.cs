@@ -13,9 +13,9 @@ namespace Burning.Emu.World.Game.Fight.Fighters
     {
         public Burning.DofusProtocol.Datacenter.Monster Monster { get; set; }
 
-        public MonsterFighter(TeamEnum team, Burning.DofusProtocol.Datacenter.Monster monster, int cellId) : base (team)
+        public MonsterFighter(int id, TeamEnum team, Burning.DofusProtocol.Datacenter.Monster monster, int cellId) : base (team)
         {
-            this.Id = cellId * -1;
+            this.Id = id;
             this.CellId = cellId;
             this.Monster = monster;
 
@@ -33,9 +33,19 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
             var characteristics = this.Monster.Grades[0];
 
-            GameFightMinimalStatsPreparation gameFightMinimalStats = new GameFightMinimalStatsPreparation((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, 0, (uint)this.ShieldPoints, characteristics.ActionPoints, characteristics.ActionPoints, characteristics.MovementPoints, characteristics.MovementPoints, 0, false,
+            GameFightMinimalStats gameFightMinimalStats =
+
+                this.Fight != null && this.Fight.FightState == FightStateEnum.FIGHT_CHOICE_PLACEMENT ?
+
+                new GameFightMinimalStatsPreparation((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, 0, (uint)this.ShieldPoints, characteristics.ActionPoints, characteristics.ActionPoints, characteristics.MovementPoints, characteristics.MovementPoints, 0, false,
                 characteristics.NeutralResistance, characteristics.EarthResistance, characteristics.WaterResistance, characteristics.AirResistance, characteristics.FireResistance, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (uint)this.Initiative);
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (uint)this.Initiative)
+
+                :
+
+                new GameFightMinimalStats((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, 0, (uint)this.ShieldPoints, characteristics.ActionPoints, characteristics.ActionPoints, characteristics.MovementPoints, characteristics.MovementPoints, 0, false,
+                characteristics.NeutralResistance, characteristics.EarthResistance, characteristics.WaterResistance, characteristics.AirResistance, characteristics.FireResistance, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
             return new GameFightMonsterInformations((double)this.Id, new EntityDispositionInformations(this.CellId, 1), Look.Parse(this.Monster.Look).GetEntityLook(), new GameContextBasicSpawnInformation(1, true, positionInformations), 0, gameFightMinimalStats, new List<uint>(), (uint)this.Monster.Id, this.Monster.Grades[0].Grade, this.Monster.Grades[0].Level);
         }

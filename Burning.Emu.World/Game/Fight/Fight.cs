@@ -57,7 +57,7 @@ namespace Burning.Emu.World.Game.Fight
 
         public Fight(Map.Map map, FightTypeEnum type, List<Fighter> defenders, List<Fighter> challengers, FightStartingPositions fightStartingPositions)
         {
-            this.Id = 1; //Uniqid a faire
+            this.Id = (int)(DateTime.Now.Ticks + new Random().Next(1, 99999)); //Uniqid a faire
             this.Map = map;
             this.FightType = type;
             this.Defenders = defenders;
@@ -264,7 +264,6 @@ namespace Burning.Emu.World.Game.Fight
         {
             TurnTimer.Stop();
 
-
             if (this.FightState != FightStateEnum.FIGHT_STARTED)
                 return;
 
@@ -278,24 +277,17 @@ namespace Burning.Emu.World.Game.Fight
             if (this.ActualFighter is CharacterFighter)
                 ((CharacterFighter)this.ActualFighter).ResetFighter();
 
-            TurnTimer.Stop();
-
             var aliveFighters = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().FindAll(x => x.Life > 0);
             var nextFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().Find(x => x.TimelineOrder > this.ActualFighter.TimelineOrder && x.Life > 0);
 
+            if (aliveFighters.Count == 0) //impossible normalement car endfight plutot mais on ne sais jamais
+                return;
+
             if (nextFighter == null)
             {
-                if (aliveFighters.Count > 1)
-                {
-                    this.ActualFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().First();
-                    this.Round += 1;
-                    messages.Add(new GameFightNewRoundMessage((uint)this.Round));
-                }
-                else
-                {
-                    Console.WriteLine("Fin du combat !");
-                    return;
-                }
+                this.ActualFighter = aliveFighters.First();
+                this.Round += 1;
+                messages.Add(new GameFightNewRoundMessage((uint)this.Round));
             }
             else
             {
@@ -318,7 +310,7 @@ namespace Burning.Emu.World.Game.Fight
 
             if(this.ActualFighter is MonsterFighter)
             {
-                //IA RUSHER
+                //IA RUSHER EXPERIMENTAL POUR MOMENT
                 var nearestFighter = BrainManager.Instance.AIGetNearestFighter(this, (MonsterFighter)this.ActualFighter);
                 BrainManager.Instance.AIMoveToTarget(this, nearestFighter);
                 BrainManager.Instance.AILaunchSpellToTarget(this, nearestFighter);
@@ -347,22 +339,24 @@ namespace Burning.Emu.World.Game.Fight
             List<NetworkMessage> messages = new List<NetworkMessage>();
 
             messages.Add(characterFighter.GetFighterStatsListMessage());
+            messages.Add(this.GetGameFightSynchronizeMessage());
 
+            this.SendSequence(SequenceTypeEnum.SEQUENCE_TURN_START, messages, 70);
+
+        }
+
+        private GameFightSynchronizeMessage GetGameFightSynchronizeMessage()
+        {
             List<GameFightFighterInformations> fightFighterInformations = new List<GameFightFighterInformations>();
 
-            foreach (var fighter in this.Challengers.Concat(this.Defenders))
+            foreach (var fighter in this.Challengers.Concat(this.Defenders).ToList().FindAll(x => x.Life > 0))
             {
-               
                 if (fighter is CharacterFighter)
                     fightFighterInformations.Add(((CharacterFighter)fighter).GetGameFightCharacterInformations());
                 else if (fighter is MonsterFighter)
                     fightFighterInformations.Add(((MonsterFighter)fighter).GetGameFightMonsterInformations());
             }
-
-            messages.Add(new GameFightSynchronizeMessage(fightFighterInformations));
-
-            this.SendSequence(SequenceTypeEnum.SEQUENCE_TURN_START, messages, 70);
-
+            return new GameFightSynchronizeMessage(fightFighterInformations);
         }
 
         public void MovementRequestSequence(int requestedCellId)
@@ -496,10 +490,16 @@ namespace Burning.Emu.World.Game.Fight
                     List<NetworkMessage> messages = new List<NetworkMessage>();
                     messages.Add(new GameFightStartMessage(new List<Idol>()));
                     messages.Add(new GameFightTurnListMessage(orderedFighters.Select(x => (double)x.Id).ToList(), new List<double> { }));
-                    
+                    messages.Add(new BasicNoOperationMessage());
+
+
                     this.ActualFighter = orderedFighters[0];
                     this.Round = 1;
-                    this.FightState = FightStateEnum.FIGHT_STARTED;
+
+                    if(this.FightState == FightStateEnum.FIGHT_CHOICE_PLACEMENT)
+                        this.FightState = FightStateEnum.FIGHT_STARTED;
+
+                    messages.Add(this.GetGameFightSynchronizeMessage());
 
                     messages.Add(new GameFightNewRoundMessage((uint)this.Round));
                     messages.Add(new GameFightTurnStartMessage(this.ActualFighter.Id, 50));
@@ -521,12 +521,16 @@ namespace Burning.Emu.World.Game.Fight
 
         public void EndFight()
         {
-            this.FightState = FightStateEnum.FIGHT_ENDED;
-            this.TeamWinner = this.Challengers.FindAll(x => x.Life > 0).Count != 0 ? TeamEnum.TEAM_CHALLENGER : TeamEnum.TEAM_DEFENDER;
+
+            if (this.FightState == FightStateEnum.FIGHT_ENDED)
+                return;
 
             //fin du timer
             this.CloseTurnTimer();
             this.ElapsdedTime.Stop();
+            this.FightState = FightStateEnum.FIGHT_ENDED;
+
+            this.TeamWinner = this.Challengers.FindAll(x => x.Life > 0).Count != 0 ? TeamEnum.TEAM_CHALLENGER : TeamEnum.TEAM_DEFENDER;
 
             //on enleve le fight de la map
             this.Map.RemoveFight(this);
@@ -567,6 +571,7 @@ namespace Burning.Emu.World.Game.Fight
             //envoyer comme si on charge une map
 
             this.SendToAllFighters(messages);
+            FightManager.Instance.Fights.Remove(this);
 
             Console.WriteLine("Fin du fight");
         }

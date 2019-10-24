@@ -28,11 +28,11 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public TeamEnum Team { get; set; }
 
-        private Fight Fight
+        public Fight Fight
         {
             get
             {
-                return FightManager.Instance.Fights.Where(x => x.Defenders.Find(d => d.Id == this.Id) != null || x.Challengers.Find(c => c.Id == this.Id) != null).Select(f => f).FirstOrDefault();
+                return FightManager.Instance.Fights.Where(x => x.FightState != FightStateEnum.FIGHT_ENDED && x.Defenders.Find(d => d.Id == this.Id) != null || x.Challengers.Find(c => c.Id == this.Id) != null).Select(f => f).FirstOrDefault();
             }
         }
 
@@ -43,6 +43,9 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public void OnLifeLost()
         {
+            if (this.Fight == null)
+                return;
+
             if(this.Life <= 0)
             {
                 //dead sequence

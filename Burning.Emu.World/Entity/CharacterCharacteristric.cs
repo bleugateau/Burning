@@ -1,5 +1,6 @@
 ﻿using Burning.Common.Entity;
 using Burning.DofusProtocol.Network.Types;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -84,5 +85,20 @@ namespace Burning.Emu.World.Entity
         public CharacterBaseCharacteristic agility { get; set; }
         public CharacterBaseCharacteristic chance { get; set; }
         public CharacterBaseCharacteristic criticalMiss { get; set; }
+
+        [BsonIgnore]
+        public int Initiative
+        {
+            get
+            {
+                return this.initiative.@base + (this.agility.@base + this.chance.@base + this.intelligence.@base + this.strength.@base + this.vitality.@base + this.wisdom.@base) +
+                    this.initiative.objectsAndMountBonus + (this.chance.objectsAndMountBonus + this.intelligence.objectsAndMountBonus + this.strength.objectsAndMountBonus + this.vitality.objectsAndMountBonus + this.wisdom.objectsAndMountBonus);
+            }
+        }
+
+        public CharacterCharacteristic()
+        {
+
+        }
     }
 }

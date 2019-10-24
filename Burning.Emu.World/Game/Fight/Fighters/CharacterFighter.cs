@@ -24,7 +24,7 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
             this.AP = characteristic.actionPoints.Total;
             this.PM = characteristic.movementPoints.Total;
-            this.Initiative = characteristic.initiative.Total;
+            this.Initiative = characteristic.Initiative;
             this.Life = characteristic.healBonus.Total + characteristic.LifeBase;
             this.LifeBase = characteristic.healBonus.Total + characteristic.LifeBase;
         }
@@ -34,13 +34,22 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
             var character = this.Character;
             var characteristic = character.Characteristics;
-
             GameContextActorPositionInformations positionInformations = new GameContextActorPositionInformations(this.Id, new EntityDispositionInformations(this.CellId, 1));
-            GameFightMinimalStats gameFightMinimalStats = new GameFightMinimalStats((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, (uint)characteristic.permanentDamagePercent.Total, (uint)this.ShieldPoints, this.AP, this.AP, this.PM, this.PM, 0, false, characteristic.neutralElementResistPercent.Total, characteristic.earthElementResistPercent.Total, characteristic.waterElementResistPercent.Total,
-                characteristic.airElementResistPercent.Total, characteristic.fireElementResistPercent.Total, characteristic.neutralElementReduction.Total, characteristic.earthElementReduction.Total, characteristic.waterElementReduction.Total, characteristic.airElementReduction.Total, characteristic.fireElementReduction.Total,
-                characteristic.criticalDamageReduction.Total, characteristic.pushDamageReduction.Total, characteristic.pvpNeutralElementResistPercent.Total, characteristic.pvpEarthElementResistPercent.Total, characteristic.pvpWaterElementResistPercent.Total,
-                characteristic.pvpAirElementResistPercent.Total, characteristic.pvpFireElementResistPercent.Total, characteristic.pvpNeutralElementReduction.Total, characteristic.pvpEarthElementReduction.Total, characteristic.pvpWaterElementReduction.Total, characteristic.pvpAirElementReduction.Total, characteristic.pvpFireElementReduction.Total, (uint)characteristic.dodgePALostProbability.Total, (uint)characteristic.dodgePMLostProbability.Total,
-                characteristic.tackleBlock.Total, characteristic.tackleEvade.Total, 0, 0, (uint)characteristic.meleeDamageReceivedPercent.Total, (uint)characteristic.rangedDamageReceivedPercent.Total, (uint)characteristic.weaponDamageReceivedPercent.Total, (uint)characteristic.spellDamageReceivedPercent.Total);
+            GameFightMinimalStats gameFightMinimalStats = 
+                this.Fight != null && this.Fight.FightState == FightStateEnum.FIGHT_CHOICE_PLACEMENT ?
+                    new GameFightMinimalStatsPreparation((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, (uint)characteristic.permanentDamagePercent.Total, (uint)this.ShieldPoints, this.AP, this.AP, this.PM, this.PM, 0, false, characteristic.neutralElementResistPercent.Total, characteristic.earthElementResistPercent.Total, characteristic.waterElementResistPercent.Total,
+                    characteristic.airElementResistPercent.Total, characteristic.fireElementResistPercent.Total, characteristic.neutralElementReduction.Total, characteristic.earthElementReduction.Total, characteristic.waterElementReduction.Total, characteristic.airElementReduction.Total, characteristic.fireElementReduction.Total,
+                    characteristic.criticalDamageReduction.Total, characteristic.pushDamageReduction.Total, characteristic.pvpNeutralElementResistPercent.Total, characteristic.pvpEarthElementResistPercent.Total, characteristic.pvpWaterElementResistPercent.Total,
+                    characteristic.pvpAirElementResistPercent.Total, characteristic.pvpFireElementResistPercent.Total, characteristic.pvpNeutralElementReduction.Total, characteristic.pvpEarthElementReduction.Total, characteristic.pvpWaterElementReduction.Total, characteristic.pvpAirElementReduction.Total, characteristic.pvpFireElementReduction.Total, (uint)characteristic.dodgePALostProbability.Total, (uint)characteristic.dodgePMLostProbability.Total,
+                    characteristic.tackleBlock.Total, characteristic.tackleEvade.Total, 0, 0, (uint)characteristic.meleeDamageReceivedPercent.Total, (uint)characteristic.rangedDamageReceivedPercent.Total, (uint)characteristic.weaponDamageReceivedPercent.Total, (uint)characteristic.spellDamageReceivedPercent.Total, (uint)characteristic.Initiative)
+
+                    :
+                
+                    new GameFightMinimalStats((uint)this.Life, (uint)this.LifeBase, (uint)this.LifeBase, (uint)characteristic.permanentDamagePercent.Total, (uint)this.ShieldPoints, this.AP, this.AP, this.PM, this.PM, 0, false, characteristic.neutralElementResistPercent.Total, characteristic.earthElementResistPercent.Total, characteristic.waterElementResistPercent.Total,
+                    characteristic.airElementResistPercent.Total, characteristic.fireElementResistPercent.Total, characteristic.neutralElementReduction.Total, characteristic.earthElementReduction.Total, characteristic.waterElementReduction.Total, characteristic.airElementReduction.Total, characteristic.fireElementReduction.Total,
+                    characteristic.criticalDamageReduction.Total, characteristic.pushDamageReduction.Total, characteristic.pvpNeutralElementResistPercent.Total, characteristic.pvpEarthElementResistPercent.Total, characteristic.pvpWaterElementResistPercent.Total,
+                    characteristic.pvpAirElementResistPercent.Total, characteristic.pvpFireElementResistPercent.Total, characteristic.pvpNeutralElementReduction.Total, characteristic.pvpEarthElementReduction.Total, characteristic.pvpWaterElementReduction.Total, characteristic.pvpAirElementReduction.Total, characteristic.pvpFireElementReduction.Total, (uint)characteristic.dodgePALostProbability.Total, (uint)characteristic.dodgePMLostProbability.Total,
+                    characteristic.tackleBlock.Total, characteristic.tackleEvade.Total, 0, 0, (uint)characteristic.meleeDamageReceivedPercent.Total, (uint)characteristic.rangedDamageReceivedPercent.Total, (uint)characteristic.weaponDamageReceivedPercent.Total, (uint)characteristic.spellDamageReceivedPercent.Total);
             //ActorExtendedAlignmentInformations actorExtendedAlignment = new ActorExtendedAlignmentInformations(0, 0, 0, 0, 0, 0, 0, 0);
             ActorAlignmentInformations actorExtendedAlignment = new ActorAlignmentInformations(0, 0, 0, 0);
 
