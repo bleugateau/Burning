@@ -139,5 +139,25 @@ namespace Burning.Emu.World.Frames
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
             }
         }
+
+        [PacketId(NpcGenericActionRequestMessage.Id)]
+        public void NpcGenericActionRequestMessageFrame(WorldClient client, NpcGenericActionRequestMessage npcGenericActionRequestMessage)
+        {
+            var npcsSpawn = NpcSpawnRepository.Instance.GetNpcSpawnsFromMapId(client.ActiveCharacter.MapId);
+
+            if (npcsSpawn.Count == 0)
+                return;
+
+            var npcSpawn = npcsSpawn.Find(x => x.Id == npcGenericActionRequestMessage.npcId * -1);
+
+            var npc = NpcRepository.Instance.GetNpcFromId(npcSpawn != null ? npcSpawn.NpcId : 0);
+
+            if (npc == null)
+                return;
+
+            client.SendPacket(new NpcDialogCreationMessage(client.ActiveCharacter.MapId, npcGenericActionRequestMessage.npcId));
+            client.SendPacket(new NpcDialogQuestionMessage((uint)npc.DialogMessages[0][0], new List<string>(), new List<uint>()));
+
+        }
     }
 }

@@ -76,7 +76,7 @@ namespace Burning.Emu.World.Game.Fight
 
             lock (locker)
             {
-                uint freeCellId = this.FightStartingPositions.positionsForChallengers.Find(x => !this.Challengers.Select(c => (uint)c.CellId).ToList().Contains(x));
+                uint freeCellId = this.FightStartingPositions.positionsForChallengers.Find(x => !this.Challengers.Select(c => (uint)c.CellId).Contains(x));
 
                 if (freeCellId == 0)
                     return;
@@ -120,7 +120,7 @@ namespace Burning.Emu.World.Game.Fight
                 fighterClient.SendPacket(new GameEntitiesDispositionMessage(new List<IdentifiedEntityDispositionInformations>() { identifiedEntityDispositionInformations }));
 
                 if (fighter is CharacterFighter)
-                    fighterClient.SendPacket(new GameFightShowFighterMessage(((CharacterFighter)newFighter).GetGameFightCharacterInformations()));
+                    fighterClient.SendPacket(new GameFightShowFighterMessage(newFighter.GetGameFightCharacterInformations()));
             }
         }
 
@@ -131,10 +131,15 @@ namespace Burning.Emu.World.Game.Fight
                 IdentifiedEntityDispositionInformations identifiedEntityDispositionInformations = new IdentifiedEntityDispositionInformations((int)fighter.CellId, 1, (double)fighter.Id);
                 client.SendPacket(new GameEntitiesDispositionMessage(new List<IdentifiedEntityDispositionInformations>() { identifiedEntityDispositionInformations }));
 
-                if (fighter is CharacterFighter)
-                    client.SendPacket(new GameFightShowFighterMessage(((CharacterFighter)fighter).GetGameFightCharacterInformations()));
-                else if (fighter is MonsterFighter)
-                    client.SendPacket(new GameFightShowFighterMessage(((MonsterFighter)fighter).GetGameFightMonsterInformations()));
+                switch(fighter)
+                {
+                    case CharacterFighter characterFighter:
+                        client.SendPacket(new GameFightShowFighterMessage(characterFighter.GetGameFightCharacterInformations()));
+                        break;
+                    case MonsterFighter monsterFighter:
+                        client.SendPacket(new GameFightShowFighterMessage(monsterFighter.GetGameFightMonsterInformations()));
+                        break;
+                }
             }
         }
 
@@ -146,9 +151,8 @@ namespace Burning.Emu.World.Game.Fight
             List<FightTeamMemberInformations> challengers = new List<FightTeamMemberInformations>();
             foreach(var fighter in this.Challengers)
             {
-                if(fighter is CharacterFighter)
+                if(fighter is CharacterFighter characterFighter)
                 {
-                    var characterFighter = (CharacterFighter)fighter;
                     challengers.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
                 }
             }
@@ -159,15 +163,14 @@ namespace Burning.Emu.World.Game.Fight
             List<FightTeamMemberInformations> defenders = new List<FightTeamMemberInformations>();
             foreach (var fighter in this.Defenders)
             {
-                if (fighter is CharacterFighter)
+                switch (fighter)
                 {
-                    var characterFighter = (CharacterFighter)fighter;
-                    defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
-                }
-                else
-                {
-                    var monsterFighter = (MonsterFighter)fighter;
-                    defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                    case CharacterFighter characterFighter:
+                        defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                        break;
+                    case MonsterFighter monsterFighter:
+                        defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                        break;
                 }
             }
             fightTeamInformations.Add(new FightTeamInformations((uint)TeamEnum.TEAM_DEFENDER, this.Defenders[0].Id, 255, (uint)TeamEnum.TEAM_DEFENDER, 0, defenders));
@@ -180,9 +183,8 @@ namespace Burning.Emu.World.Game.Fight
             List<FightTeamMemberInformations> challengers = new List<FightTeamMemberInformations>();
             foreach (var fighter in this.Challengers)
             {
-                if (fighter is CharacterFighter)
+                if (fighter is CharacterFighter characterFighter)
                 {
-                    var characterFighter = (CharacterFighter)fighter;
                     challengers.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
                 }
             }
@@ -190,15 +192,15 @@ namespace Burning.Emu.World.Game.Fight
             List<FightTeamMemberInformations> defenders = new List<FightTeamMemberInformations>();
             foreach (var fighter in this.Defenders)
             {
-                if (fighter is CharacterFighter)
+
+                switch(fighter)
                 {
-                    var characterFighter = (CharacterFighter)fighter;
-                    defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
-                }
-                else
-                {
-                    var monsterFighter = (MonsterFighter)fighter;
-                    defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                    case CharacterFighter characterFighter:
+                        defenders.Add(new FightTeamMemberCharacterInformations(characterFighter.Id, characterFighter.Character.Name, (uint)characterFighter.Character.Level));
+                        break;
+                    case MonsterFighter monsterFighter:
+                        defenders.Add(new FightTeamMemberMonsterInformations(monsterFighter.Id, monsterFighter.Monster.Id, monsterFighter.Monster.Grades[0].Grade));
+                        break;
                 }
             }
 
@@ -247,7 +249,7 @@ namespace Burning.Emu.World.Game.Fight
 
         private void SendToAllFighters(List<NetworkMessage> messages)
         {
-            foreach (var fighter in this.Challengers.Concat(this.Defenders).ToList().FindAll(x => x is CharacterFighter))
+            foreach (var fighter in this.Challengers.Concat(this.Defenders).Where(x => x is CharacterFighter))
             {
                 var client = WorldManager.Instance.GetClientFromCharacter(((CharacterFighter)fighter).Character);
                 if (client != null)

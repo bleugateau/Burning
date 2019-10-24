@@ -49,7 +49,7 @@ namespace Burning.Common.Repository
 
         public Npc GetNpcFromId(int npcId, bool lazy = true)
         {
-            var npc = this.List.Find(x => x.Id == npcId);
+            var npc = this.List.Find(x => x != null && x.Id == npcId);
 
             if (!lazy || npc == null)
             {
