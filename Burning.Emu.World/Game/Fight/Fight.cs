@@ -18,6 +18,7 @@ using Burning.Emu.World.Game.Fight.Spell;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
 using Burning.Emu.World.Game.Shapes;
+using Burning.Emu.World.Game.Shapes.Zones;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Network;
 using Burning.Emu.World.Repository;
@@ -44,6 +45,14 @@ namespace Burning.Emu.World.Game.Fight
         public FightStateEnum FightState { get; set; }
 
         public int Round { get; set; }
+
+        public List<Fighter> Fighters
+        {
+            get
+            {
+                return this.Defenders.Concat(this.Challengers).ToList();
+            }
+        }
 
         private Timer TurnTimer { get; set; }
 
@@ -106,7 +115,7 @@ namespace Burning.Emu.World.Game.Fight
 
         public void SendFighterDispositionInformations(CharacterFighter newFighter)
         {
-            foreach (var fighter in this.Challengers.Concat(this.Defenders).Where(x => x is CharacterFighter))
+            foreach (var fighter in this.Fighters.Where(x => x is CharacterFighter))
             {
 
                 var characterFighter = (CharacterFighter)fighter;
@@ -221,7 +230,7 @@ namespace Burning.Emu.World.Game.Fight
             if (this.FightState != FightStateEnum.FIGHT_CHOICE_PLACEMENT)
                 return false;
 
-            CharacterFighter fighter = (CharacterFighter)this.Challengers.Concat(this.Defenders).ToList().Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id);
+            CharacterFighter fighter = (CharacterFighter)this.Fighters.Find(x => x is CharacterFighter && x.Id == client.ActiveCharacter.Id);
 
             if (fighter == null)
                 return false;
@@ -249,7 +258,7 @@ namespace Burning.Emu.World.Game.Fight
 
         private void SendToAllFighters(List<NetworkMessage> messages)
         {
-            foreach (var fighter in this.Challengers.Concat(this.Defenders).Where(x => x is CharacterFighter))
+            foreach (var fighter in this.Fighters.Where(x => x is CharacterFighter))
             {
                 var client = WorldManager.Instance.GetClientFromCharacter(((CharacterFighter)fighter).Character);
                 if (client != null)
@@ -279,8 +288,8 @@ namespace Burning.Emu.World.Game.Fight
             if (this.ActualFighter is CharacterFighter)
                 ((CharacterFighter)this.ActualFighter).ResetFighter();
 
-            var aliveFighters = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().FindAll(x => x.Life > 0);
-            var nextFighter = this.Challengers.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().Find(x => x.TimelineOrder > this.ActualFighter.TimelineOrder && x.Life > 0);
+            var aliveFighters = this.Fighters.OrderBy(x => x.TimelineOrder).ToList().FindAll(x => x.Life > 0);
+            var nextFighter = this.Fighters.Concat(this.Defenders).OrderBy(x => x.TimelineOrder).ToList().Find(x => x.TimelineOrder > this.ActualFighter.TimelineOrder && x.Life > 0);
 
             if (aliveFighters.Count == 0) //impossible normalement car endfight plutot mais on ne sais jamais
                 return;
@@ -351,7 +360,7 @@ namespace Burning.Emu.World.Game.Fight
         {
             List<GameFightFighterInformations> fightFighterInformations = new List<GameFightFighterInformations>();
 
-            foreach (var fighter in this.Challengers.Concat(this.Defenders).ToList().FindAll(x => x.Life > 0))
+            foreach (var fighter in this.Fighters.FindAll(x => x.Life > 0))
             {
                 if (fighter is CharacterFighter)
                     fightFighterInformations.Add(((CharacterFighter)fighter).GetGameFightCharacterInformations());
@@ -363,7 +372,7 @@ namespace Burning.Emu.World.Game.Fight
 
         public void MovementRequestSequence(int requestedCellId)
         {
-            var usedCells = this.Defenders.Concat(this.Challengers).Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
+            var usedCells = this.Fighters.Where(f => f.Life > 0).Select(x => (int)x.CellId).ToArray();
 
             var path = new Pathfinder(usedCells);
             path.SetMap(this.Map.MapData, false);
@@ -394,10 +403,8 @@ namespace Burning.Emu.World.Game.Fight
 
         public void CastSpellRequestSequence(int cellId, int spellId)
         {
-            if(this.ActualFighter is CharacterFighter)
+            if(this.ActualFighter is CharacterFighter characterFighter)
             {
-                var characterFighter = (CharacterFighter)this.ActualFighter;
-
                 var spellItem = characterFighter.Character.GetAvaibleSpells().Find(x => x.spellId == spellId);
                 if (spellItem == null)
                     return;
@@ -417,14 +424,20 @@ namespace Burning.Emu.World.Game.Fight
 
                 Dictionary<int, int> effectAlreadyApplyqued = new Dictionary<int, int>();
 
+                queueMessages.Add(new DebugClearHighlightCellsMessage());
+
                 foreach (var effect in spellLevel.Effects)
                 {
                     var rawZone = new RawZone(effect.RawZone);
-
                     uint effectZoneStopAtTarget = effect.ZoneStopAtTarget != null ? (uint)effect.ZoneStopAtTarget : 0;
-
                     var shapeZone = SpellZoneManager.Instance.getZone(this.Map.MapData, rawZone.m_zoneShape, rawZone.m_zoneSize, rawZone.m_zoneMinSize, this.ActualFighter.CellId, cellId, false, effectZoneStopAtTarget, false);
-                    var targets = this.Challengers.Concat(this.Defenders).ToList().FindAll(x => shapeZone.getCells((uint)cellId).Contains((uint)x.CellId));
+
+                    var targetMask = SpellZoneManager.Instance.GetFightersHitFromTargetMask(this, shapeZone.getCells((uint)cellId), this.ActualFighter, (uint)cellId, effect);
+
+                    queueMessages.Add(new DebugHighlightCellsMessage(Color.Aquamarine.ToArgb(), shapeZone.getCells((uint)cellId)));
+
+                    //var targets = this.Fighters.FindAll(x => shapeZone.getCells((uint)cellId).Contains((uint)x.CellId));
+                    var targets = targetMask;
 
                     foreach (var target in targets)
                     {
@@ -479,7 +492,7 @@ namespace Burning.Emu.World.Game.Fight
                     this.ElapsdedTime.Start();
 
                     //actualise l'ordre dans la timeline
-                    var orderedFighters = this.Challengers.Concat(this.Defenders).OrderByDescending(x => x.Initiative).ToList();
+                    var orderedFighters = this.Fighters.OrderByDescending(x => x.Initiative).ToList();
                     for(int i = 0; i < orderedFighters.Count; i++)
                     {
                         orderedFighters[i].TimelineOrder = (i + 1);
@@ -541,26 +554,25 @@ namespace Burning.Emu.World.Game.Fight
 
             List<FightResultListEntry> fightResultLists = new List<FightResultListEntry>();
 
-            foreach (var fighter in this.Defenders.Concat(this.Challengers))
+            foreach (var fighter in this.Fighters)
             {
                 //winner = 2 - looser = 0
                 int outcome = fighter.Team == this.TeamWinner ? 2 : 0;
-                if(fighter is CharacterFighter)
+                if(fighter is CharacterFighter characterFighter)
                 {
-                    var charactFighter = (CharacterFighter)fighter;
-                    var client = this.Map.GetClientFromCharacter(charactFighter.Character);
+                    var client = this.Map.GetClientFromCharacter(characterFighter.Character);
 
-                    int expEarned = FightManager.Instance.GetExperienceEarned(charactFighter.Character, this);
-                    var loots = FightManager.Instance.GetDropEarned(charactFighter.Character, this);
-                    int kamas = FightManager.Instance.getKamasEarned(charactFighter.Character, this);
+                    int expEarned = FightManager.Instance.GetExperienceEarned(characterFighter.Character, this);
+                    var loots = FightManager.Instance.GetDropEarned(characterFighter.Character, this);
+                    int kamas = FightManager.Instance.getKamasEarned(characterFighter.Character, this);
 
 
-                    FightManager.Instance.SaveCharacterEndFightProgress(this.Map, charactFighter.Character, loots, expEarned, kamas);
+                    FightManager.Instance.SaveCharacterEndFightProgress(this.Map, characterFighter.Character, loots, expEarned, kamas);
                     
 
-                    fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(loots, kamas), fighter.Id, fighter.Life > 0, (uint)charactFighter.Character.Level, new List<FightResultAdditionalData>()
+                    fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(loots, kamas), fighter.Id, fighter.Life > 0, (uint)characterFighter.Character.Level, new List<FightResultAdditionalData>()
                     {
-                        new FightResultExperienceData(charactFighter.Character.Experience + expEarned, true, 0, true, 1000, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
+                        new FightResultExperienceData(characterFighter.Character.Experience + expEarned, true, 0, true, 1000, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
                     }));
                 }
                 else

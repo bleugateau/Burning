@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Repository;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.DofusProtocol.Datacenter;
 
 namespace Burning.Emu.World.Frames
 {
@@ -156,8 +157,39 @@ namespace Burning.Emu.World.Frames
                 return;
 
             client.SendPacket(new NpcDialogCreationMessage(client.ActiveCharacter.MapId, npcGenericActionRequestMessage.npcId));
-            client.SendPacket(new NpcDialogQuestionMessage((uint)npc.DialogMessages[0][0], new List<string>(), new List<uint>()));
 
+            KeyValuePair<int, List<uint>> messageNpc = ExperimentalFindMessageId(npc);
+
+            
+            client.SendPacket(new NpcDialogQuestionMessage((uint)messageNpc.Key, new List<string>(), messageNpc.Value));
+
+        }
+
+        public KeyValuePair<int, List<uint>> ExperimentalFindMessageId(Npc npc)
+        {
+            int result = npc.DialogMessages.Count != 0 ? npc.DialogMessages[0][0] : 0;
+            List<uint> replies = new List<uint>();
+
+            for (int i = 0; i < npc.DialogMessages.Count; i++)
+            {
+                var npcReplies = npc.DialogReplies.Where(x => x[0] > npc.DialogMessages[i][0] && (i != npc.DialogMessages.Count - 1 ? x[0] < npc.DialogMessages[i + 1][0] : false)).Select(x => (uint)x[0]);
+
+
+                if (npc.DialogMessages[i][0] == 20780)
+                {
+                    Console.WriteLine("NPC MESSAGE ID: 20780");
+                    Console.WriteLine("NPC NEXT MESSAGE ID: {0}.", npc.DialogMessages[i + 1][0]);
+                }
+
+                if (npcReplies.Count() != 0 && npcReplies.Count() < 5)
+                {
+                    result = npc.DialogMessages[i][0];
+                    replies = npcReplies.ToList();
+                    break;
+                }
+            }
+
+            return new KeyValuePair<int, List<uint>>(result, replies);
         }
     }
 }

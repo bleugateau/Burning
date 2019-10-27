@@ -31,7 +31,6 @@ D:\Developpement\C#\Burning\Burning.Emu\bin\Debug\netcoreapp2.1\Burning.Common.p
 D:\Developpement\C#\Burning\Burning.Emu\bin\Debug\netcoreapp2.1\Burning.Protocol.pdb
 D:\Developpement\C#\Burning\Burning.Emu\obj\Debug\netcoreapp2.1\Burning.Emu.csproj.CopyComplete
 D:\Developpement\C#\Burning2.52\Burning.Emu\obj\Debug\netcoreapp2.1\Burning.Emu.csprojAssemblyReference.cache
-D:\Developpement\C#\Burning2.52\Burning.Emu\obj\Debug\netcoreapp2.1\Burning.Emu.csproj.CoreCompileInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.Emu\obj\Debug\netcoreapp2.1\Burning.Emu.AssemblyInfoInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.Emu\obj\Debug\netcoreapp2.1\Burning.Emu.AssemblyInfo.cs
 D:\Developpement\C#\Burning2.52\Burning.Emu\bin\Debug\netcoreapp2.1\Burning.Emu.deps.json

@@ -28,7 +28,7 @@ namespace Burning.Emu.World.Game.Shapes
             var data = rawZone.Remove(0, 1).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             var hasMinSize = shape == SpellShapeEnum.C || shape == SpellShapeEnum.X || shape == SpellShapeEnum.Q || shape == SpellShapeEnum.plus || shape == SpellShapeEnum.sharp;
 
-
+            /*
             try
             {
                 if (data.Length >= 4)
@@ -47,6 +47,19 @@ namespace Burning.Emu.World.Game.Shapes
                 }
             }
             catch (Exception ex)
+            {
+                m_zoneShape = 0;
+                m_zoneSize = 0;
+                m_zoneMinSize = 0;
+            }
+
+    */
+            try
+            {
+                size = byte.Parse(data[0]);
+                minSize = byte.Parse(data[1]);
+            }
+            catch
             {
                 m_zoneShape = 0;
                 m_zoneSize = 0;

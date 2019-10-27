@@ -15,7 +15,6 @@ C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.Do
 C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.dll
 C:\Users\tenfo\Desktop\Protocol Dofus\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.pdb
 D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.csprojAssemblyReference.cache
-D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.csproj.CoreCompileInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.dll
 D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\obj\Debug\Burning.DofusProtocol.pdb
 D:\Developpement\C#\Burning2.52\Burning.DofusProtocol\bin\Debug\Burning.DofusProtocol.dll

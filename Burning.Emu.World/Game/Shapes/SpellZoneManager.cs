@@ -1,15 +1,62 @@
 ﻿using Burning.Common.Managers.Singleton;
 using Burning.DofusProtocol.Data.D2P;
+using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Network.Types;
+using Burning.Emu.World.Game.Fight.Fighters;
 using Burning.Emu.World.Game.Shapes.Zones;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Burning.Emu.World.Game.Shapes
 {
     public class SpellZoneManager : SingletonManager<SpellZoneManager>
     {
+
+        public List<Fighter> GetFightersHitFromTargetMask(Fight.Fight fight, List<uint> cells, Fighter caster, uint cellId, EffectInstanceDice effect)
+        {
+            var fighters = new List<Fighter>();
+
+            foreach (var targetMask in effect.TargetMask)
+            {
+                switch ((TargetMaskEnum)targetMask)
+                {
+                    case TargetMaskEnum.a:
+                        fighters.AddRange(fight.Fighters.Where(x => x.Life > 0 && x.Team == caster.Team && cells.Contains((uint)x.CellId)));
+                        break;
+                    case TargetMaskEnum.A:
+                        fighters.AddRange(fight.Fighters.Where(x => x.Life > 0 && x.Team != caster.Team && cells.Contains((uint)x.CellId)));
+                        break;
+                    case TargetMaskEnum.g:
+                        fighters.AddRange(fight.Fighters.Where(x => x.Life > 0 && x.Team == caster.Team && x != caster && cells.Contains((uint)x.CellId)));
+                        break;
+                    case TargetMaskEnum.c:
+                        if(cells.Contains((uint)caster.CellId))
+                        {
+                            fighters.Add(caster);
+                        }
+                        break;
+                    case TargetMaskEnum.C:
+                        fighters.Add(caster);
+                        break;
+
+                    case TargetMaskEnum.D:
+                    case TargetMaskEnum.H:
+                    case TargetMaskEnum.J:
+                    case TargetMaskEnum.l:
+                    case TargetMaskEnum.M:
+                    case TargetMaskEnum.m:
+                    case TargetMaskEnum.j:
+                    case TargetMaskEnum.L:
+                    case TargetMaskEnum.P:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return fighters;
+        }
 
         public IZone getZone(DofusProtocol.Data.D2P.Map map, int pShape, uint pZoneSize, uint pMinZoneSize, int casterCellId, int cellId, bool pIgnoreShapeA = false, uint pStopAtTarget = 0, bool pIsWeapon = false)
         {

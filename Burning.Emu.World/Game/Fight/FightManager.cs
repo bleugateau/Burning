@@ -35,7 +35,7 @@ namespace Burning.Emu.World.Game.Fight
             {
                 character.Level += 1;
 
-                if(client != null)
+                if (client != null)
                     client.SendPacket(new CharacterLevelUpMessage((uint)character.Level));
             }
 
@@ -60,7 +60,11 @@ namespace Burning.Emu.World.Game.Fight
             InventoryRepository.Instance.Update(inventory);
 
             if (client != null)
+            {
                 client.ActiveCharacter = character;
+                //exit de la map le joueur pour le faire actualiser la carte TODO
+            }
+
         }
 
         public List<uint> GetDropEarned(Character character, Fight fight)

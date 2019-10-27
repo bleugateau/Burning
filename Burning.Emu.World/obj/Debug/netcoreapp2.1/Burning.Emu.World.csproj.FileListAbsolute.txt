@@ -14,7 +14,6 @@ D:\Developpement\C#\Burning\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Em
 D:\Developpement\C#\Burning\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.dll
 D:\Developpement\C#\Burning\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.pdb
 D:\Developpement\C#\Burning\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.csprojAssemblyReference.cache
-D:\Developpement\C#\Burning2.52\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.csproj.CoreCompileInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.AssemblyInfoInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.Emu.World\obj\Debug\netcoreapp2.1\Burning.Emu.World.AssemblyInfo.cs
 D:\Developpement\C#\Burning2.52\Burning.Emu.World\bin\Debug\netcoreapp2.1\Burning.Emu.World.deps.json
