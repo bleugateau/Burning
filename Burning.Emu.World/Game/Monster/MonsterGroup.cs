@@ -40,10 +40,12 @@ namespace Burning.Emu.World.Game.Monster
             if (monsterInSubarea.Count == 0)
                 return;
 
-            int numberOfMonster = random.Next(1, 8 + 1);
+            int numberOfMonster = random.Next(1, 2 + 1);
             var groupStatic = new GroupMonsterStaticInformations();
 
             groupStatic.underlings = new List<MonsterInGroupInformations>();
+
+            EntityLook lookOfLeader = Look.Parse(monsterInSubarea[0].Look).GetEntityLook();
 
             for (int m = 0; m < numberOfMonster; m++)
             {
@@ -51,6 +53,7 @@ namespace Burning.Emu.World.Game.Monster
                 if (m == 0)
                 {
                     groupStatic.mainCreatureLightInfos = new MonsterInGroupLightInformations(monsterInSubarea[monsterNum].Id, monsterInSubarea[monsterNum].Grades[0].Grade, monsterInSubarea[monsterNum].Grades[0].Level);
+                    lookOfLeader = Look.Parse(monsterInSubarea[monsterNum].Look).GetEntityLook();
                 }
                 else
                 {
@@ -61,7 +64,7 @@ namespace Burning.Emu.World.Game.Monster
             }
 
 
-            this.RolePlayGroupMonsterInformations = new GameRolePlayGroupMonsterInformations(this.Id, new EntityDispositionInformations(MapManager.Instance.CheckWalkableCell(this.Map, random.Next(100, 342)), 4), Look.Parse(monsterInSubarea[0].Look).GetEntityLook(), groupStatic, 0, 255, false, false, false);
+            this.RolePlayGroupMonsterInformations = new GameRolePlayGroupMonsterInformations(this.Id, new EntityDispositionInformations(MapManager.Instance.CheckWalkableCell(this.Map, random.Next(100, 342)), 4), lookOfLeader, groupStatic, 0, 255, false, false, false);
 
             Console.WriteLine("MONSTER GROUP {0} SPAWNED. ", this.Id);
 

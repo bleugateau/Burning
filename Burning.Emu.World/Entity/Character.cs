@@ -6,6 +6,7 @@ using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Game.Fight;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.Emu.World.Game.Level;
 using Burning.Emu.World.Repository;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
@@ -25,7 +26,7 @@ namespace Burning.Emu.World.Entity
 
         public int Level { get; set; }
 
-        public int Experience { get; set; }
+        public double Experience { get; set; }
 
         public bool Sex { get; set; }
 
@@ -157,7 +158,7 @@ namespace Burning.Emu.World.Entity
 
 
 
-            return new CharacterCharacteristicsInformations(this.Experience, 0, 1000, 0, this.Kamas, (uint)characteristics.CapitalPoint, 0, 0, actorExtendedAlignment,
+            return new CharacterCharacteristicsInformations(this.Experience, LevelManager.Instance.GetActualLevelExperience<Character>(this).Experience, LevelManager.Instance.GetNextLevelByExperience<Character>(this).Experience, 0, this.Kamas, (uint)characteristics.CapitalPoint, 0, 0, actorExtendedAlignment,
                 (uint)characteristics.LifeBase + (uint)characteristics.vitality.Total, (uint)characteristics.LifeBase + (uint)characteristics.vitality.Total, 5000, 10000, 6, 3, characteristics.initiative, characteristics.prospecting, characteristics.actionPoints, characteristics.movementPoints, characteristics.strength, characteristics.vitality, characteristics.wisdom, characteristics.chance, characteristics.agility, characteristics.intelligence, characteristics.range, characteristics.summonableCreaturesBoost, characteristics.reflect, characteristics.criticalHit, 0,
                 characteristics.criticalMiss, characteristics.healBonus, characteristics.allDamagesBonus, characteristics.weaponDamagesBonusPercent, characteristics.damagesBonusPercent, characteristics.trapBonus, characteristics.trapBonusPercent, characteristics.glyphBonusPercent, characteristics.runeBonusPercent, characteristics.permanentDamagePercent,
                 characteristics.tackleBlock, characteristics.tackleEvade, characteristics.PAAttack, characteristics.PMAttack, characteristics.pushDamageBonus, characteristics.criticalDamageBonus, characteristics.neutralDamageBonus, characteristics.earthDamageBonus, characteristics.waterDamageBonus, characteristics.airDamageBonus, characteristics.fireDamageBonus, characteristics.dodgePALostProbability,
@@ -166,6 +167,19 @@ namespace Burning.Emu.World.Entity
                 characteristics.pvpAirElementResistPercent, characteristics.pvpFireElementResistPercent, characteristics.pvpNeutralElementReduction, characteristics.pvpEarthElementReduction, characteristics.pvpWaterElementReduction, characteristics.pvpAirElementReduction, characteristics.pvpFireElementReduction,
                 characteristics.meleeDamageDonePercent, characteristics.meleeDamageReceivedPercent, characteristics.rangedDamageDonePercent, characteristics.rangedDamageReceivedPercent, characteristics.weaponDamageDonePercent, characteristics.weaponDamageReceivedPercent, characteristics.spellDamageDonePercent,
                 characteristics.spellDamageReceivedPercent, new List<CharacterSpellModification>(), 0);
+        }
+
+        public void OnLevelUp()
+        {
+            this.Level += 1;
+
+            var characteristic = this.Characteristics;
+
+            characteristic.CapitalPoint += 5;
+            characteristic.LifeBase += 5;
+
+            CharacterRepository.Instance.Update(this);
+            CharacterCharacteristicRepository.Instance.Update(characteristic);
         }
 
         public List<Spell> GetSpells()

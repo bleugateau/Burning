@@ -14,6 +14,7 @@ using Burning.Emu.World.Game.World;
 using Burning.Common.Managers.Database;
 using Burning.Emu.World.Repository;
 using Burning.Emu.World.Entity;
+using Burning.Emu.World.Game.Level;
 
 namespace Burning.Emu.World.Frames
 {
@@ -367,6 +368,9 @@ namespace Burning.Emu.World.Frames
             }
 
             client.SendPacket(new ChatServerMessage(10, "Bienvenue sur l'émulateur <b>Burning</b> développé par <b>Ten</b>.", 0, "", 0, "", "", 0));
+
+
+            LevelManager.Instance.CheckLevelUpFromExperience<Character>(client.ActiveCharacter);
         }
 
         /*

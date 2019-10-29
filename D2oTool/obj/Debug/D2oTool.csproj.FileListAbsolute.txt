@@ -25,7 +25,6 @@ D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.csprojAssemblyReferenc
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.Form1.resources
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.Properties.Resources.resources
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.csproj.GenerateResource.cache
-D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.csproj.CoreCompileInputs.cache
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.csproj.CopyComplete
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.exe
 D:\Developpement\C#\Burning2.52\D2oTool\obj\Debug\D2oTool.pdb

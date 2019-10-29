@@ -15,6 +15,7 @@ using Burning.Emu.World.Game.Fight.Brain;
 using Burning.Emu.World.Game.Fight.Effects;
 using Burning.Emu.World.Game.Fight.Fighters;
 using Burning.Emu.World.Game.Fight.Spell;
+using Burning.Emu.World.Game.Level;
 using Burning.Emu.World.Game.Map;
 using Burning.Emu.World.Game.PathFinder;
 using Burning.Emu.World.Game.Shapes;
@@ -562,7 +563,7 @@ namespace Burning.Emu.World.Game.Fight
                 {
                     var client = this.Map.GetClientFromCharacter(characterFighter.Character);
 
-                    int expEarned = FightManager.Instance.GetExperienceEarned(characterFighter.Character, this);
+                    double expEarned = FightManager.Instance.GetExperienceEarned(characterFighter.Character, this);
                     var loots = FightManager.Instance.GetDropEarned(characterFighter.Character, this);
                     int kamas = FightManager.Instance.getKamasEarned(characterFighter.Character, this);
 
@@ -572,7 +573,7 @@ namespace Burning.Emu.World.Game.Fight
 
                     fightResultLists.Add(new FightResultPlayerListEntry((uint)outcome, 0, new FightLoot(loots, kamas), fighter.Id, fighter.Life > 0, (uint)characterFighter.Character.Level, new List<FightResultAdditionalData>()
                     {
-                        new FightResultExperienceData(characterFighter.Character.Experience + expEarned, true, 0, true, 1000, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
+                        new FightResultExperienceData(characterFighter.Character.Experience + expEarned, true, LevelManager.Instance.GetActualLevelExperience<Character>(characterFighter.Character).Experience, true, LevelManager.Instance.GetNextLevelByExperience<Character>(characterFighter.Character).Experience, true, expEarned, true, 0.0, true, 0.0, true, false, 0)
                     }));
                 }
                 else

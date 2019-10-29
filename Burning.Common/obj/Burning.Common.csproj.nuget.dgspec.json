@@ -10,14 +10,11 @@
         "projectUniqueName": "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj",
         "projectName": "Burning.Common",
         "projectPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\Burning.Common.csproj",
-        "packagesPath": "C:\\Users\\tenfo\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\Ten\\.nuget\\packages\\",
         "outputPath": "D:\\Developpement\\C#\\Burning2.52\\Burning.Common\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\tenfo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Ten\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

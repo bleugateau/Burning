@@ -3,6 +3,7 @@ using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Network.Messages;
 using Burning.Emu.World.Entity;
 using Burning.Emu.World.Game.Fight.Fighters;
+using Burning.Emu.World.Game.Level;
 using Burning.Emu.World.Repository;
 using System;
 using System.Collections.Generic;
@@ -24,21 +25,12 @@ namespace Burning.Emu.World.Game.Fight
             this.Fights = new List<Fight>();
         }
 
-        public void SaveCharacterEndFightProgress(Map.Map map, Character character, List<uint> loots, int experienceEarned, int kamasEarned)
+        public void SaveCharacterEndFightProgress(Map.Map map, Character character, List<uint> loots, double experienceEarned, int kamasEarned)
         {
             var client = map.GetClientFromCharacter(character);
             var inventory = character.Inventory;
 
             character.Experience += experienceEarned;
-
-            if (experienceEarned > 1000) //gerer l'exp TODO
-            {
-                character.Level += 1;
-
-                if (client != null)
-                    client.SendPacket(new CharacterLevelUpMessage((uint)character.Level));
-            }
-
             character.Kamas += kamasEarned;
 
             foreach (var loot in loots)
@@ -52,6 +44,7 @@ namespace Burning.Emu.World.Game.Fight
 
                 if (client == null)
                     continue;
+
                 client.SendPacket(new ObjectAddedMessage(item, 0));
                 client.SendPacket(new InventoryWeightMessage(0, 0, 1000));
             }
@@ -59,10 +52,19 @@ namespace Burning.Emu.World.Game.Fight
             CharacterRepository.Instance.Update(character);
             InventoryRepository.Instance.Update(inventory);
 
+            if (LevelManager.Instance.CheckLevelUpFromExperience<Character>(character)) //gerer l'exp TODO
+            {
+                //levelup
+                character.OnLevelUp();
+
+                if (client != null)
+                    client.SendPacket(new CharacterLevelUpMessage((uint)character.Level));
+            }
+
+            //exit de la map le joueur pour le faire actualiser la carte TODO
             if (client != null)
             {
                 client.ActiveCharacter = character;
-                //exit de la map le joueur pour le faire actualiser la carte TODO
             }
 
         }
@@ -115,7 +117,7 @@ namespace Burning.Emu.World.Game.Fight
             return false;
         }
 
-        public int GetExperienceEarned(Character character, Fight fight)
+        public double GetExperienceEarned(Character character, Fight fight)
         {
             var monsters = fight.Defenders.Where(x => x.Life <= 0).Select(x => (MonsterFighter)x).ToList();
             var characters = fight.Challengers.Select(x => (CharacterFighter)x).ToList();
@@ -144,7 +146,7 @@ namespace Burning.Emu.World.Game.Fight
 
             double baseXp = Math.Truncate(xpRatio / 100 * Math.Truncate(sumMonsterXp * palierGroup[regularGroupRatio - 1] * levelCoeff));
             //double multiplicator = fighter.Fight.AgeBonus <= 0 ? 1 : 1 + fighter.Fight.AgeBonus / 100d;
-            var xp = (int)Math.Truncate(Math.Truncate(baseXp * (100 + character.Characteristics.wisdom.Total) / 100d) * 1);
+            var xp = Math.Truncate(Math.Truncate(baseXp * (100 + character.Characteristics.wisdom.Total) / 100d) * 1);
 
             return xp;
         }

@@ -20,28 +20,104 @@ namespace Burning.D2oSync
         static void Main(string[] args)
         {
             Database = new MongoClient("mongodb://localhost").GetDatabase("burning_datacenter253");
+            //SynchronizeD2o<Effect>("Effects");
+            GetCharacterXpAndGuildMapping();
             GetDindeXpMapping();
+            GetJobXpMapping();
 
             Console.ReadKey();
         }
 
+
+        public static void SynchronizeD2o<T>(string d2oName, string nameOutput = "")
+        {
+            if (nameOutput == "")
+                nameOutput = d2oName.ToLower();
+
+            Reader = new D2oReader(BasePath + d2oName + ".d2o");
+
+            var collection = Database.GetCollection<T>(nameOutput);
+            if (collection == null)
+            {
+                Database.CreateCollection(nameOutput);
+                collection = Database.GetCollection<T>(nameOutput);
+            }
+
+            int counter = 0;
+            foreach (var item in Reader.ReadObjects())
+            {
+                counter++;
+                collection.InsertOne((T)item.Value);
+                Console.WriteLine("{0} {1}/{2} added.", d2oName, counter, Reader.IndexCount);
+            }
+
+            Console.WriteLine("Collection generated :)", nameOutput);
+        }
+
+        public static async Task ConvertListToCollection<T>(string nameCollection, List<T> objects)
+        {
+
+            var collection = Database.GetCollection<T>(nameCollection);
+            if (collection != null)
+                await Database.DropCollectionAsync(nameCollection);
+
+            await Database.CreateCollectionAsync(nameCollection);
+
+            collection = Database.GetCollection<T>(nameCollection);
+
+            await collection.InsertManyAsync(objects);
+            
+
+            Console.WriteLine("Collection {0} is make from list of type: {1}", nameCollection, typeof(T).Name);
+        }
+
+        public static void GetCharacterXpAndGuildMapping()
+        {
+            Reader = new D2oReader(BasePath + "CharacterXPMappings.d2o");
+
+            List<LevelDetail> charactersExp = new List<LevelDetail>();
+            List<LevelDetail> guildExp = new List<LevelDetail>();
+
+            foreach (var item in Reader.ReadObjects())
+            {
+                CharacterXPMapping content = (CharacterXPMapping)item.Value;
+                charactersExp.Add(new LevelDetail(content.Level, content.ExperiencePoints));
+
+                if(content.Level < 201)
+                    guildExp.Add(new LevelDetail(content.Level, content.ExperiencePoints * 10));
+            }
+
+            Task.Run(async () => await ConvertListToCollection<LevelDetail>("characters_experiences", charactersExp)).Wait();
+            Task.Run(async () => await ConvertListToCollection<LevelDetail>("guilds_experiences", guildExp)).Wait();
+
+
+        }
+
+
         public static void GetDindeXpMapping()
         {
+            List<LevelDetail> levelDetails = new List<LevelDetail>();
+            levelDetails.Add(new LevelDetail(1, 0));
             int oldValue = 450;
-            for(int i = 1; i < 201; i++)
+            for(int i = 2; i < 101; i++)
             {
                 int result = oldValue + 250;
                 oldValue = result;
                 Console.WriteLine("LVL {0} XP necessaire {1}", i, result);
+                levelDetails.Add(new LevelDetail(i, result));
             }
+
+            Task.Run(async () => await ConvertListToCollection<LevelDetail>("mounts_experiences", levelDetails)).Wait();
         }
 
-        public static void GetJobXpMapping(string basePath)
+        public static void GetJobXpMapping()
         {
+            List<LevelDetail> levelDetails = new List<LevelDetail>();
+            levelDetails.Add(new LevelDetail(1, 0));
             int baseValue = 0;
             int oldBaseValue = 0;
 
-            for(int i = 1; i < 201; i++)
+            for(int i = 2; i < 201; i++)
             {
                 int result = baseValue + (baseValue - oldBaseValue) + 20;
                 if (i == 1)
@@ -53,7 +129,10 @@ namespace Burning.D2oSync
                 baseValue = result;
 
                 Console.WriteLine("LVL {0} XP necessaire {1}", i, result);
+                levelDetails.Add(new LevelDetail(i, result));
             }
+
+            Task.Run(async () => await ConvertListToCollection<LevelDetail>("jobs_experiences", levelDetails)).Wait();
         }
 
         public static void GetNpcs(string basePath)

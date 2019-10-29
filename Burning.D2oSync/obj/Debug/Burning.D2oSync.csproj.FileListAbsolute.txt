@@ -1,5 +1,4 @@
 D:\Developpement\C#\Burning2.52\Burning.D2oSync\obj\Debug\Burning.D2oSync.csprojAssemblyReference.cache
-D:\Developpement\C#\Burning2.52\Burning.D2oSync\obj\Debug\Burning.D2oSync.csproj.CoreCompileInputs.cache
 D:\Developpement\C#\Burning2.52\Burning.D2oSync\bin\Debug\Burning.D2oSync.exe.config
 D:\Developpement\C#\Burning2.52\Burning.D2oSync\bin\Debug\Burning.D2oSync.exe
 D:\Developpement\C#\Burning2.52\Burning.D2oSync\bin\Debug\Burning.D2oSync.pdb

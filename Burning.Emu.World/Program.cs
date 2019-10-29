@@ -35,6 +35,7 @@ namespace Burning.Emu.World
             DatabaseManager.Instance.Initialize("mongodb://localhost");
             
             AccountRepository.Instance.Initialize("account");
+            LevelExperienceRepository.Instance.Initialize("");
             CharacterRepository.Instance.Initialize("character");
             InventoryRepository.Instance.Initialize("inventory");
 
