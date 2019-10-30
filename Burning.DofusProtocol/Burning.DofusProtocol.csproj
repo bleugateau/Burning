@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Data\D2o\other\IdolsPresetIcon.cs" />
     <Compile Include="Data\D2P\MapPoint.cs" />
+    <Compile Include="Enums\CharacteristicEnum.cs" />
     <Compile Include="Enums\EffectsEnum.cs" />
     <Compile Include="Network\BooleanByteWrapper.cs" />
     <Compile Include="Network\ConnectionPasswordMessage.cs" />

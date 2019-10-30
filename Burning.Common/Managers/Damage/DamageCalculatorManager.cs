@@ -20,6 +20,9 @@ namespace Burning.Common.Managers.Damage
             int totalDamage = this.GetDamageTotalFromEffect(effect, puissance, caracteristic, bonusFixDamage);
             int sufferedDamage = GetDamageSuffered(totalDamage, fixResistance, pourcentResistance);
 
+            if (sufferedDamage <= 0)
+                return 0;
+
             return sufferedDamage;
         }
 

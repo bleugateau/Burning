@@ -364,26 +364,29 @@ namespace Burning.Emu.World.Repository
 
             this.Update(inventory);
 
-            //gérer les stats des items BIENTOT QUAND INVENTAIRE BIEN ENTAMER
-            if (itemTemplate.appearanceId != 0 && !apparat)
+            //gérer les stats des items + skins
+            if (!apparat)
             {
-                var look = new Look(client.ActiveCharacter.EntityLook);
+                if (itemTemplate.appearanceId != 0)
+                {
+                    var look = new Look(client.ActiveCharacter.EntityLook);
 
-                if (appartSkin != 0)
-                    look.AddSkin(appartSkin);
-                else
-                    look.AddSkin(itemTemplate.appearanceId);
+                    if (appartSkin != 0)
+                        look.AddSkin(appartSkin);
+                    else
+                        look.AddSkin(itemTemplate.appearanceId);
 
-                client.ActiveCharacter.EntityLook = look.GetDatas();
+                    client.ActiveCharacter.EntityLook = look.GetDatas();
+                }
+                
 
                 //add effect of item
                 CharacterCharacteristicRepository.Instance.ApplyEffects(client.ActiveCharacter, item.effects);
 
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
-            }
 
-            if(!apparat)
                 client.SendPacket(new ObjectMovementMessage((uint)item.objectUID, (uint)position));
+            }
 
             if(stackedItemsList.Count != 0)
             {

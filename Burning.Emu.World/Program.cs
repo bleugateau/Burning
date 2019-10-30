@@ -39,6 +39,8 @@ namespace Burning.Emu.World
             CharacterRepository.Instance.Initialize("character");
             InventoryRepository.Instance.Initialize("inventory");
 
+            EffectRepository.Instance.Initialize("effects");
+
             BreedRepository.Instance.Initialize("breeds");
             SpellRepository.Instance.Initialize("spells");
 

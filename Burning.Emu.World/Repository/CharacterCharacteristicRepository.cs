@@ -1,6 +1,7 @@
 ﻿using Burning.Common.Managers.Database;
 using Burning.Common.Managers.Singleton;
 using Burning.Common.Repository;
+using Burning.DofusProtocol.Datacenter;
 using Burning.DofusProtocol.Enums;
 using Burning.DofusProtocol.Network.Types;
 using Burning.Emu.World.Entity;
@@ -81,6 +82,33 @@ namespace Burning.Emu.World.Repository
         }
 
 
+        private string GetCharacteristicNameFromEffect(Character character, Effect effect, uint value)
+        {
+            switch((CharacteristicEnum)effect.Characteristic)
+            {
+                case CharacteristicEnum.PA:
+                    return "actionPoints";
+                case CharacteristicEnum.STRENGTH:
+                    return "strength";
+                case CharacteristicEnum.INTELLIGENCE:
+                    return "intelligence";
+                case CharacteristicEnum.AGILITY:
+                    return "agility";
+                case CharacteristicEnum.CHANCE:
+                    return "chance";
+                case CharacteristicEnum.VITALITY:
+                    return "vitality";
+                case CharacteristicEnum.WISDOM:
+                    return "wisdom";
+                case CharacteristicEnum.RANGE:
+                    return "range";
+                default:
+                    Console.WriteLine("ID {0} characteristic not managed with value of {1}", effect.Characteristic, value);
+                    break;
+            }
+            return null;
+        }
+
         public void ApplyEffects(Character character, List<ObjectEffect> effects, bool deApply = false)
         {
             var characteristic = character.Characteristics;
@@ -89,57 +117,34 @@ namespace Burning.Emu.World.Repository
 
             foreach(var effect in effects.Select(x => (ObjectEffectInteger)x))
             {
-                //EffectsEnum
+                var effectTemplate = EffectRepository.Instance.GetEffect((int)effect.actionId);
+                if (effectTemplate == null)
+                    continue;
 
-                switch((EffectsEnum)effect.actionId)
+
+                var characteristicName = GetCharacteristicNameFromEffect(character, effectTemplate, effect.value);
+                if (characteristicName == null)
+                    continue;
+
+                var retrievedCharacteristic = characteristic.GetType().GetProperty(characteristicName).GetValue(characteristic, null);
+
+                if (!(retrievedCharacteristic is CharacterBaseCharacteristic baseCharacteristic))
+                    continue;
+
+
+                switch (effectTemplate.Operator)
                 {
-                    case EffectsEnum.Effect_AddStrength:
+                    case "+":
                         if(!deApply)
-                            characteristic.strength.objectsAndMountBonus += (int)(effect.value);
+                            baseCharacteristic.objectsAndMountBonus += (int)effect.value;
                         else
-                            characteristic.strength.objectsAndMountBonus -= (int)(effect.value);
+                            baseCharacteristic.objectsAndMountBonus -= (int)effect.value;
                         break;
-                    case EffectsEnum.Effect_AddChance:
+                    case "-":
                         if (!deApply)
-                            characteristic.chance.objectsAndMountBonus += (int)(effect.value);
+                            baseCharacteristic.objectsAndMountBonus -= (int)effect.value;
                         else
-                            characteristic.chance.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddAgility:
-                        if (!deApply)
-                            characteristic.agility.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.agility.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddHealth:
-                        if (!deApply)
-                            characteristic.healBonus.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.healBonus.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddIntelligence:
-                        if (!deApply)
-                            characteristic.intelligence.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.intelligence.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddWisdom:
-                        if (!deApply)
-                            characteristic.wisdom.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.wisdom.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddVitality:
-                        if (!deApply)
-                            characteristic.vitality.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.vitality.objectsAndMountBonus -= (int)(effect.value);
-                        break;
-                    case EffectsEnum.Effect_AddInitiative:
-                        if (!deApply)
-                            characteristic.initiative.objectsAndMountBonus += (int)(effect.value);
-                        else
-                            characteristic.initiative.objectsAndMountBonus -= (int)(effect.value);
+                            baseCharacteristic.objectsAndMountBonus += (int)effect.value;
                         break;
                 }
             }

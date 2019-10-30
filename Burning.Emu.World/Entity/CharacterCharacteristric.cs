@@ -18,6 +18,24 @@ namespace Burning.Emu.World.Entity
 
         public int LifeBase { get; set; }
 
+        [BsonIgnore]
+        public int PA
+        {
+            get
+            {
+                return Math.Min(this.actionPoints.Total, 12);
+            }
+        }
+
+        [BsonIgnore]
+        public int PM
+        {
+            get
+            {
+                return Math.Min(this.movementPoints.Total, 6);
+            }
+        }
+
         public CharacterBaseCharacteristic fireElementReduction { get; set; }
         public CharacterBaseCharacteristic airElementReduction { get; set; }
         public CharacterBaseCharacteristic waterElementReduction { get; set; }

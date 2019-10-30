@@ -32,6 +32,12 @@ namespace Burning.Emu.World.Frames
 
                     InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position);
                     break;
+                case CharacterInventoryPositionEnum.ACCESSORY_POSITION_BELT:
+                    if(item.typeId == 10)
+                    {
+                        InventoryRepository.Instance.MoveItemToPosition(client, (int)objectSetPositionMessage.objectUID, (int)objectSetPositionMessage.position, item.typeId == 177 ? true : false);
+                    }
+                    break;
                 case CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT:
                     if (item.typeId == 16 || item.typeId == 177) //chapeau et apparat
                     {
