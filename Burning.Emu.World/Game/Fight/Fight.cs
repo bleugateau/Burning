@@ -433,12 +433,11 @@ namespace Burning.Emu.World.Game.Fight
                     uint effectZoneStopAtTarget = effect.ZoneStopAtTarget != null ? (uint)effect.ZoneStopAtTarget : 0;
                     var shapeZone = SpellZoneManager.Instance.getZone(this.Map.MapData, rawZone.m_zoneShape, rawZone.m_zoneSize, rawZone.m_zoneMinSize, this.ActualFighter.CellId, cellId, false, effectZoneStopAtTarget, false);
 
-                    var targetMask = SpellZoneManager.Instance.GetFightersHitFromTargetMask(this, shapeZone.getCells((uint)cellId), this.ActualFighter, (uint)cellId, effect);
+                    var targets = SpellZoneManager.Instance.GetFightersHitFromTargetMask(this, shapeZone.getCells((uint)cellId), this.ActualFighter, (uint)cellId, effect);
 
                     queueMessages.Add(new DebugHighlightCellsMessage(Color.Aquamarine.ToArgb(), shapeZone.getCells((uint)cellId)));
 
                     //var targets = this.Fighters.FindAll(x => shapeZone.getCells((uint)cellId).Contains((uint)x.CellId));
-                    var targets = targetMask;
 
                     foreach (var target in targets)
                     {

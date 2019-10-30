@@ -20,6 +20,46 @@ namespace Burning.Emu.World.Game.Fight.Fighters
 
         public int ShieldPoints { get; set; }
 
+        public int Agility { get; set; }
+
+        public int Strength { get; set; }
+
+        public int Wisdom { get; set; }
+
+        public int Water { get; set; }
+
+        public int Intelligence { get; set; }
+
+        public int AllDamageBonus { get; set; }
+
+        public int AgilityDamageBonus { get; set; }
+
+        public int StrengthDamageBonus { get; set; }
+
+        public int WaterDamageBonus { get; set; }
+
+        public int IntelligenceDamageBonus { get; set; }
+
+        public int AgilityResistance { get; set; }
+
+        public int StrengthResistance { get; set; }
+
+        public int NeutralResistance { get; set; }
+
+        public int WaterResistance { get; set; }
+
+        public int IntelligenceResistance { get; set; }
+
+        public int AgilityPercentResistance { get; set; }
+
+        public int StrengthPercentResistance { get; set; }
+
+        public int NeutralPercentResistance { get; set; }
+
+        public int WaterPercentResistance { get; set; }
+
+        public int IntelligencePercentResistance { get; set; }
+
         public int AP { get; set; }
 
         public int PM { get; set; }
@@ -39,6 +79,24 @@ namespace Burning.Emu.World.Game.Fight.Fighters
         public Fighter(TeamEnum team)
         {
             this.Team = team;
+
+            this.Agility = 0;
+            this.Water = 0;
+            this.Intelligence = 0;
+            this.Strength = 0;
+            this.Wisdom = 0;
+
+            this.AllDamageBonus = 0;
+            this.WaterDamageBonus = 0;
+            this.AgilityDamageBonus = 0;
+            this.IntelligenceDamageBonus = 0;
+            this.StrengthDamageBonus = 0;
+
+            this.AgilityResistance = 0;
+            this.WaterResistance = 0;
+            this.StrengthResistance = 0;
+            this.IntelligenceResistance = 0;
+            this.NeutralResistance = 0;
         }
 
         public void OnLifeLost()
