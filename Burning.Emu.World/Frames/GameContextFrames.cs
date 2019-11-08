@@ -22,6 +22,7 @@ using Burning.Emu.World.Game.World;
 using Burning.Emu.World.Repository;
 using Burning.Emu.World.Game.Fight.Fighters;
 using Burning.DofusProtocol.Datacenter;
+using Burning.Emu.World.Game.Interactive;
 
 namespace Burning.Emu.World.Frames
 {
@@ -47,9 +48,40 @@ namespace Burning.Emu.World.Frames
         public void MapInformationsRequestMessageFrame(WorldClient client, MapInformationsRequestMessage mapInformationsRequestMessage)
         {
             var map = MapManager.Instance.GetMap(client.ActiveCharacter.MapId);
+
+            // interative elements
             List<InteractiveElement> interactiveElements = new List<InteractiveElement>();
+            foreach (var iElement in map.InteractiveElementList)
+            {
+
+                InteractiveElement interactiveElement = new InteractiveElement((uint)iElement.ElementId, iElement.TypeId, new List<InteractiveElementSkill>() { new InteractiveElementSkill((uint)iElement.SkillId, 0) }, new List<InteractiveElementSkill>(), true);
+                /*
+                if(iElement.TypeId == 43)
+                {
+                    interactiveElement = new InteractiveElementWithAgeBonus((uint)iElement.ElementId, iElement.TypeId, new List<InteractiveElementSkill>() { new InteractiveElementSkill((uint)iElement.SkillId, 0) }, new List<InteractiveElementSkill>(), true, 0);
+                }*/
+
+                
+
+                interactiveElements.Add(interactiveElement);
+            }
+
+            
+
+            // stated elements
             List<StatedElement> statedElements = new List<StatedElement>();
-           
+            foreach (var sElement in map.StatedElementList)
+            {
+                StatedElement statedElement = new StatedElement();
+                statedElement.elementCellId = (uint)sElement.CellId;
+                statedElement.elementId = (uint)sElement.ElementId;
+                statedElement.elementState = 0;
+                statedElement.onCurrentMap = true;
+
+                statedElements.Add(statedElement);
+            }
+
+
             List<uint> elementIds = new List<uint>();
 
             //quand joueur entre sur la carte
@@ -106,7 +138,12 @@ namespace Burning.Emu.World.Frames
                 client.ActiveCharacter.CellId = cellId;
                 CharacterRepository.Instance.Update(client.ActiveCharacter);
             }
-            
+        }
+
+        [PacketId(InteractiveUseRequestMessage.Id)]
+        public void InteractiveUseRequestMessageFrame(WorldClient client, InteractiveUseRequestMessage interactiveUseRequestMessage)
+        {
+            InteractiveManager.Instance.Dispatch(114, client);
         }
 
         [PacketId(ChangeMapMessage.Id)]

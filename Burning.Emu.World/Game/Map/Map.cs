@@ -25,9 +25,9 @@ namespace Burning.Emu.World.Game.Map
 
         public List<NpcSpawn> NpcSpawnList { get; set; }
 
-        public List<InteractiveElement> InteractiveElementList { get; set; }
+        public List<MapInteractiveElement> InteractiveElementList { get; set; }
 
-        public List<StatedElement> StatedElementList { get; set; }
+        public List<MapStatedElement> StatedElementList { get; set; }
 
         public List<MonsterGroup> MonstersGroups { get; set; }
 
@@ -58,8 +58,14 @@ namespace Burning.Emu.World.Game.Map
             //startfightposition a faire
             this.Fights = new List<Fight.Fight>();
             this.ClientsOnMap = new List<WorldClient>();
-            this.InteractiveElementList = new List<InteractiveElement>(); //a fill avec la db
-            this.StatedElementList = new List<StatedElement>(); //a fill avec la db
+            this.InteractiveElementList = MapInteractiveElementRepository.Instance.GetMapInteractiveElementsFromMapId(this.Id);
+            this.StatedElementList = MapStatedElementRepository.Instance.GetMapStatedElementsFromMapId(this.Id);
+
+            if(this.InteractiveElementList.Count > 0 || this.StatedElementList.Count > 0)
+            {
+                Console.WriteLine("HOP HOP");
+            }
+
         }
 
         public List<MonsterGroup> FillMonstersGroups()

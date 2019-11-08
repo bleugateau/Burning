@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Burning.Emu.World.Repository;
+using Burning.Emu.World.Game.Interactive;
 
 namespace Burning.Emu.World.Game.Map
 {
@@ -30,6 +31,9 @@ namespace Burning.Emu.World.Game.Map
 
             MapPositionRepository.Instance.Initialize("MapPositions"); //load map position
             NpcSpawnRepository.Instance.Initialize("npcs_spawns"); //load npcs
+            MapInteractiveElementRepository.Instance.Initialize("maps_interactive_elements"); //load interactive elements
+            MapStatedElementRepository.Instance.Initialize("maps_stated_elements"); //load stated elements
+            InteractiveManager.Instance.Initialize(); //interactive manager
 
             Console.WriteLine("Map lazy loading from d2p...");
         }
